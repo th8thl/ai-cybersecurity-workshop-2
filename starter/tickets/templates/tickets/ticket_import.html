@@ -1,0 +1,9 @@
+{% extends 'tickets/base.html' %}{% block content %}
+<div class="detail"><p><a href="{% url 'ticket_list' %}">← Your tickets</a></p>
+<section class="panel detail-body"><h1>Import a ticket file</h1>
+<p>Upload a saved ticket request to create a new ticket owned by your account.</p>
+<p>Use a JSON file or a Python pickle (.pkl) file.</p>
+<p><a href="{% url 'ticket_import_template' %}">Download a JSON example</a>. It contains <code>{"title":"Registration help"}</code>. Imported tickets start open.</p>
+{% if error %}<p class="application-error" role="alert">{{ error }}</p>{% endif %}
+<form method="post" enctype="multipart/form-data">{% csrf_token %}{{ form.as_p }}<button>Import ticket</button></form>
+</section></div>{% endblock %}

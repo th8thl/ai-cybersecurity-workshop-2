@@ -1,0 +1,35 @@
+{
+  "name": "Session 2 - Secure Application Design",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+  "containerEnv": {
+    "OLLAMA_MODELS": "/workspaces/.ollama-models"
+  },
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "postStartCommand": "bash .devcontainer/start-ollama.sh",
+  "forwardPorts": [
+    8000,
+    8001
+  ],
+  "portsAttributes": {
+    "8000": {
+      "label": "Session 2 starter",
+      "visibility": "private",
+      "onAutoForward": "openBrowser"
+    },
+    "8001": {
+      "label": "Session 2 solution",
+      "visibility": "private"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "${workspaceFolder}/starter/.venv/bin/python"
+      },
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+define bot refuse to respond
+  "The campus support policy blocked this request."
+
+define flow workshop boundary
+  $allowed = execute check_workshop_policy
+  if not $allowed
+    bot refuse to respond
+    stop
+
+define flow block bulk exports
+  $allowed = execute check_bulk_export_policy
+  if not $allowed
+    bot refuse to respond
+    stop

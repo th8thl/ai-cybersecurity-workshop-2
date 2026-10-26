@@ -1,0 +1,20 @@
+{% extends 'tickets/base.html' %}{% block content %}<div class="detail"><p><a href="{% url 'ticket_list' %}">← Your tickets</a></p><section class="panel detail-body">
+{% if unavailable %}<h1>Ticket unavailable</h1><p>This ticket doesn't exist or isn't available to your account.</p>
+{% elif error and not ticket %}<h1>Unable to load ticket</h1><p class="application-error" role="alert"><strong>Application error</strong><br>{{ error }}</p>
+{% else %}<p class="muted">Support ticket #{{ ticket.ticket_id }}</p><h1>{{ ticket.title }}</h1><p>Status: <span class="status {{ ticket.status }}">{{ ticket.status|title }}</span></p>
+{% if error %}<p class="application-error" role="alert"><strong>Application error</strong><br>{{ error }}</p>{% endif %}
+{% if ticket.status == 'open' %}
+{% if approvals %}<h2>Confirm ticket closure</h2><p>The ticket is still open. Confirm below to close it, or keep it open.</p>
+{% for approval in approvals %}<div class="confirmation"><p>Close this ticket? This confirmation expires five minutes after it was requested and can be used once.</p><div class="actions"><form method="post">{% csrf_token %}<input type="hidden" name="ticket_action" value="confirm"><input type="hidden" name="approval_id" value="{{ approval.pk }}"><button>Yes, close ticket</button></form><form method="post">{% csrf_token %}<input type="hidden" name="ticket_action" value="cancel"><input type="hidden" name="approval_id" value="{{ approval.pk }}"><button class="secondary">Keep it open</button></form></div></div>{% endfor %}
+{% else %}<p>If you no longer need help, you can close this request.</p><form method="post">{% csrf_token %}<input type="hidden" name="ticket_action" value="close"><button>Close ticket</button></form>{% endif %}
+{% else %}<p>This ticket is closed.</p>{% endif %}
+
+<h2>Attachments</h2>
+<p>Upload a supporting document or image for this ticket. Downloads require sign-in.</p>
+{% for attachment in attachments %}<p><a href="{% url 'attachment_download' ticket.ticket_id %}?name={{ attachment.storage_name|urlencode }}">Download {{ attachment.original_name }}</a> <span class="muted">({{ attachment.size }} bytes)</span></p>
+{% empty %}<p>No attachments yet.</p>{% endfor %}
+<form method="post" enctype="multipart/form-data">{% csrf_token %}
+<input type="hidden" name="ticket_action" value="attach">
+{{ attachment_form.as_p }}<button>Upload attachment</button></form>
+<p><a href="{% url 'ticket_export' ticket.ticket_id %}">Export ticket as JSON</a></p>
+{% endif %}</section></div>{% endblock %}

@@ -1,0 +1,4 @@
+{% extends 'tickets/base.html' %}{% block content %}<div class="detail"><p><a href="{% url 'ticket_list' %}">← Your tickets</a></p><section class="panel detail-body"><h1>New ticket</h1><p>Tell the support team what you need help with. Use made-up information for this workshop.</p>
+{% if error %}<p class="application-error" role="alert"><strong>Application error</strong><br>{{ error }}</p>{% endif %}
+<form method="post">{% csrf_token %}{{ form.as_p }}<button>Create ticket</button> <a href="{% url 'ticket_list' %}">Cancel</a></form>
+</section></div>{% endblock %}

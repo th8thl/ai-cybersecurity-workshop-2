@@ -1,0 +1,26 @@
+{% extends 'tickets/base.html' %}{% block content %}
+<div class="detail"><p><a href="{% url 'assistant' %}">← Assistant</a> · <a href="{% url 'ticket_list' %}">Your tickets</a></p>
+<section class="panel detail-body"><h1>Authorize the assistant</h1>
+<p>Signed in as <strong>{{ request.user.username }}</strong>.</p>
+<p><strong>{{ client_name }}</strong> wants to use the MCP ticket server on your behalf.</p>
+<p>Choose the actions it may request. Your ticket pages work even if you deny access.
+Use the ticket page to review and confirm closure requests.</p>
+<p class="muted">Workshop demonstration of consent and delegated access; this is not a complete OAuth provider.</p>
+{% if issued_token %}<div class="notice"><strong>Access granted.</strong> The client received a token for your selected permissions.</div>
+<p>Expires: {{ authorization.expires_at|date:"Y-m-d H:i:s T" }}.</p>
+<ul>{% for label in permission_labels %}<li>{{ label }}</li>{% endfor %}</ul>
+<p><a class="button" href="{% url 'assistant' %}">Continue to assistant</a></p>
+<details><summary>Inspect the token for the terminal exercise</summary>
+<p>This token is shown only in this response. Treat it as a password; do not include it in prompts, reports or screenshots.</p>
+<textarea readonly rows="3" aria-label="Access token shown once">{{ issued_token }}</textarea>
+<p>The database stores its hash. The browser holds the client's copy in an HttpOnly cookie.</p></details>
+{% else %}
+{% if authorization %}<p>Current access expires: {{ authorization.expires_at|date:"Y-m-d H:i:s T" }}.</p>
+<ul>{% for label in permission_labels %}<li>{{ label }}</li>{% endfor %}</ul>
+{% else %}<p>{{ authorization_error }}</p>{% endif %}
+<form method="post">{% csrf_token %}{{ form.as_p }}
+<button name="decision" value="allow">Authorize assistant</button>
+<button class="secondary" name="decision" value="deny" formnovalidate>Deny access</button></form>
+{% endif %}
+{% if authorization %}<form method="post" action="{% url 'assistant_revoke' %}">{% csrf_token %}<p><button class="secondary">Revoke assistant access</button></p></form>{% endif %}
+</section></div>{% endblock %}

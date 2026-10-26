@@ -1,0 +1,15 @@
+# One environment for the app and all workshop exercises.
+Django==5.2.18
+python-dotenv==1.2.4
+google-genai==1.75.0
+jsonschema==4.26.0
+bandit==1.9.4
+semgrep==1.141.0
+nemoguardrails==0.24.1
+langchain-openai==1.7.2
+# Match Semgrep telemetry dependencies without resolver backtracking.
+opentelemetry-instrumentation-requests==0.58b0
+# Semgrep MCP 1.16 uses a Pydantic API removed in newer releases.
+pydantic==2.11.10
+
+mcp==1.16.0
