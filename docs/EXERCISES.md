@@ -39,7 +39,7 @@ code, and repeat the requests. Use made-up accounts and information throughout.
 - [2. Inspect structured model output](#2-inspect-structured-model-output)
 - [3. Fix the acceptance of invalid ticket requests](#3-fix-the-acceptance-of-invalid-ticket-requests)
 - [4. Stop Alice from reading Bob's ticket](#4-stop-alice-from-reading-bobs-ticket)
-- [5. Start the ticket server and call it directly](#5-start-the-ticket-mcp-server-and-call-it-directly)
+- [5. Start the ticket MCP server and call it directly](#5-start-the-ticket-mcp-server-and-call-it-directly)
 - [6. Require confirmation before closing a ticket](#6-require-confirmation-before-closing-a-ticket)
 - [7. Test assistant permissions, expiry and revocation](#7-test-assistant-permissions-expiry-and-revocation)
 - [8. Run NeMo directly from the terminal](#8-run-nemo-directly-from-the-terminal)

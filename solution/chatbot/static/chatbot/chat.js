@@ -49,7 +49,7 @@ document.addEventListener('submit', async event => {
   event.preventDefault();
   if (busy) return;
   const body = new FormData(form);
-  body.set('provider', chat.querySelector('[name="provider"]').value);
+  body.set('provider', document.getElementById('provider').value);
   if (form === chat && !field.value.trim()) return;
   const submittedMessage = form === chat ? field.value : null;
   busy = true;
@@ -78,7 +78,7 @@ document.addEventListener('submit', async event => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || `Request failed (HTTP ${response.status}).`);
     const page = new DOMParser().parseFromString(data.html, 'text/html');
-    for (const selector of ['#conversation', '#confirmations', '#ticket-list', '#request-trace', '#action-audit']) {
+    for (const selector of ['#conversation', '#confirmations', '#ticket-list', '#assistant-access', '#request-trace', '#action-audit']) {
       const target = document.querySelector(selector);
       const source = page.querySelector(selector);
       if (target && source) target.innerHTML = source.innerHTML;

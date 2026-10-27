@@ -29,7 +29,7 @@ def context(request):
         "authorization":grant, "authorization_error":authorization_error,
         "permission_labels":[PERMISSIONS[p] for p in grant.scopes] if grant else [],
         "form_token": str(uuid4()),
-        "tickets": Ticket.objects.filter(owner=request.user).order_by("-pk"),
+        "tickets": Ticket.objects.filter(owner=request.user).order_by("-pk")[:3],
         "approvals": Approval.objects.filter(actor=request.user, consumed=False,
             created_at__gte=timezone.now()-timedelta(minutes=5), ticket__owner=request.user,
             ticket__status="open").select_related("ticket"),
