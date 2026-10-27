@@ -1,3 +1,4 @@
+from django.conf import settings
 from .common import TicketTestCase
 from tickets.models import AuditEvent
 from chatbot.tool_policy import execute
@@ -17,7 +18,7 @@ class SecurityTests(TicketTestCase):
 
     def test_authenticated_console_and_malformed_json(self):
         self.client.force_login(self.alice)
-        self.assertContains(self.client.get('/chatbot/'), 'Campus Support Assistant')
+        self.assertContains(self.client.get('/chatbot/'), settings.CHATBOT_THEME['assistant_name'])
         response = self.client.post('/chatbot/', {'proposal': 'not json'})
         self.assertContains(response, 'Request rejected')
 

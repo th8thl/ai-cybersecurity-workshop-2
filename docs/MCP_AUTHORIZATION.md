@@ -74,7 +74,7 @@ Run `python manage.py migrate` when updating an existing copy. The migration
 adds the authorization table without resetting accounts or tickets. Each user
 must authorize the assistant; setup does not issue grants automatically.
 
-Follow [Exercise 7](EXERCISES.md#7-authorize-the-assistant-and-control-its-mcp-access)
+Grant initial read access in [Exercise 1](EXERCISES.md#1-create-tickets-for-alice-and-bob) before the model request in Exercise 2. Follow [Exercise 7](EXERCISES.md#7-test-assistant-permissions-expiry-and-revocation)
 for denial, read-only access, changed permissions, expiry and revocation. The
 integration health check uses temporary users and explicitly created test grants;
 it never changes a real user's consent.

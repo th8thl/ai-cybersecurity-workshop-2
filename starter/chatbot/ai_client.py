@@ -88,7 +88,7 @@ class MockChatClient:
             )
         elif "hello" in lower or "hi" in lower:
             text = mock_responses["greeting"]
-        elif any(keyword in lower for keyword in ["campus", "utep", "advisor", "advising", "registration", "financial aid", "finals", "student"]):
+        elif any(keyword in lower for keyword in active_theme.get("topic_keywords", [])):
             text = mock_responses["topic"]
         elif any(keyword in lower for keyword in ["poem", "recipe", "pirate", "travel", "vacation", "movie critic"]):
             text = mock_responses["off_topic"]

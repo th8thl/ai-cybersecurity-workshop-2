@@ -67,3 +67,10 @@ See [the consent flow](MCP_AUTHORIZATION.md).
 
 ## Opening links from chat
 Every link inside the conversation opens in a new browser tab. Keep the chatbot tab open and switch back to it after inspecting a ticket. This applies to existing messages and newly received replies.
+
+### Activate the environment in every exercise terminal
+
+From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
+`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
+all workshop commands. Repeat activation in every new terminal.
+See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).

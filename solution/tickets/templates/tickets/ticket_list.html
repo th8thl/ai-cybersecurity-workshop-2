@@ -1,8 +1,7 @@
 {% extends 'tickets/base.html' %}{% block content %}
 <div class="page-head"><div><h1>Your tickets</h1><p class="muted">Track your support requests and manage their status.</p></div><a class="button" href="{% url 'ticket_create' %}">New ticket</a></div>
-<p><a class="button" href="{% url 'ticket_import' %}">Import a ticket file</a></p>
 <section class="panel">
 {% for ticket in tickets %}<a class="ticket-link" href="{% url 'ticket_detail' ticket.pk %}"><strong>{{ ticket.title }}</strong><span class="ticket-meta"><span>Ticket #{{ ticket.pk }} · View ticket →</span><span class="status {{ ticket.status }}">{{ ticket.status|title }}</span></span></a>
-{% empty %}<div class="detail-body"><h2>No tickets yet</h2><p>Create a ticket to request help with advising, registration or financial aid.</p></div>{% endfor %}
+{% empty %}<div class="detail-body"><h2>No tickets yet</h2><p>Create a ticket to describe your support request.</p></div>{% endfor %}
 </section>
 {% endblock %}

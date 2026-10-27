@@ -45,7 +45,7 @@ All dependencies, including scanners and NeMo, are in this folder's `requirement
 
 Some security tests intentionally fail before the repairs. Connection errors and missing dependencies are not intentional failures. Use the exercise-specific commands: the default health check expects the original flaws to be present. After your repairs, use `--secured` so it expects those flaws to be fixed.
 
-Returning another day? See [Returning to the workshop](../docs/SETUP.md#returning-to-the-workshop-another-day). Keep `.env`, `.venv/`, `uploads/` and database files out of submissions and Git.
+Returning another day? See [Returning to the workshop](../docs/SETUP.md#returning-to-the-workshop-another-day). Keep `.env`, `.venv/` and database files out of submissions and Git.
 
 After signing in, open **Assistant → Authorize assistant** and choose permissions
 and a duration. Ordinary ticket pages work independently. See
@@ -67,16 +67,8 @@ tickets until an authorized client provides one.
 
 For ordinary website use, no separate server command is needed: the application
 starts the MCP process and supplies the user's token for each request. Follow the
-[MCP exercise](../docs/EXERCISES.md#5-start-the-ticket-server-and-call-it-directly)
-to discover the available actions, read a ticket and check refused requests.
+[MCP exercise](../docs/EXERCISES.md#5-start-the-ticket-mcp-server-and-call-it-directly)
+to discover the available tools.
 The exercise client starts a new server process; it does not attach to the
 terminal opened by the command above.
 
-## Ticket imports and attachments
-
-Use **Import a ticket file** on the ticket list. Use **Attachments** and
-**Export ticket as JSON** on a ticket page. The code is in `tickets/file_imports.py`
-and `tickets/attachments.py`, not a separate example folder. See
-[the file-security walkthrough](../docs/EXERCISES.md#10-fix-unsafe-ticket-imports-and-attachment-downloads).
-After updating an existing installation, run `python manage.py migrate` once
-before restarting the website. Keep `uploads/` out of Git and submissions.

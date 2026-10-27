@@ -27,7 +27,7 @@ function bubble(role, text) {
   node.className = `bubble ${role}`;
   const label = document.createElement('span');
   label.className = 'role';
-  label.textContent = role === 'user' ? 'You' : 'Campus assistant';
+  label.textContent = role === 'user' ? 'You' : conversation.dataset.assistantName;
   node.append(label, document.createTextNode(text));
   conversation.append(node);
   conversation.scrollTop = conversation.scrollHeight;

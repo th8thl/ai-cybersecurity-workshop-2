@@ -17,8 +17,7 @@
 - Use actual stdio MCP initialization, discovery and calls. The educational
   consent flow is not a complete OAuth provider; distributed production should
   use a real provider and the MCP HTTP authorization specification.
-- Scan the real application and test actual file imports and attachment routes.
-  Retain the existing scanner rules and positive/negative security evidence.
-- The student code intentionally retains the validation, ownership, approval and
-  file-handling weaknesses identified in the exercises. User consent/token
+- Scan the real application and test authorization and model-tool boundaries.
+- The student code intentionally retains the validation, ownership, approval
+  weaknesses identified in the exercises. User consent/token
   enforcement and NeMo integration are working infrastructure in both versions.

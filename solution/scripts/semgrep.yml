@@ -13,19 +13,3 @@ rules:
     pattern: subprocess.check_output(..., shell=True, ...)
     metadata:
       cwe: CWE-78
-  - id: workshop-unsafe-deserialization
-    languages: [python]
-    severity: ERROR
-    message: Do not deserialize untrusted pickle data; use a data format and validate its schema.
-    pattern: pickle.loads(...)
-    metadata:
-      cwe: CWE-502
-  - id: workshop-path-traversal
-    languages: [python]
-    severity: ERROR
-    message: Unchecked attachment path; resolve the path and enforce directory containment.
-    pattern-either:
-      - pattern: (Path("attachments") / $NAME).read_text()
-      - pattern: ($FOLDER / $NAME).open("rb")
-    metadata:
-      cwe: CWE-22

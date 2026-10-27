@@ -1,6 +1,6 @@
 # Explain the security findings
 
-Use this reference when filling in [Student evidence](NOTES_TEMPLATE.md). Follow [Exercise 10](EXERCISES.md#10-fix-unsafe-ticket-imports-and-attachment-downloads) for the scanner steps. Record the file/line and output you actually observed.
+Use this reference when filling in [Student evidence](NOTES_TEMPLATE.md). Record the file/line and output you actually observed.
 
 **CWE** names a specific weakness. **OWASP** categories group broader risks. The mappings below are teaching classifications, not a claim that a scanner performed a complete OWASP assessment.
 
@@ -17,23 +17,10 @@ exploits: the provided authorization mechanism should reject them. Service
 unavailability is not evidence of attack prevention. Exercise 7 checks consent,
 limited permissions, expiry and revocation as existing infrastructure.
 
-## File operations used by the running website
-
-| Function and entry point | Weakness and OWASP category | Repair |
-|---|---|---|
-| `tickets/file_imports.py:load_ticket_file`, called by `/tickets/import/` | CWE-502: Deserialization of Untrusted Data; Software and Data Integrity Failures. Reading an attacker-supplied pickle can execute Python before validation. | Accept JSON only and validate exactly the title field. |
-| `tickets/attachments.py:open_attachment`, called by `/tickets/<id>/attachments/download/` | CWE-22: Path Traversal; Broken Access Control. A manipulated download name can read outside the selected ticket's attachment folder. | Resolve and confine the path, require the matching attachment record, and retain the shared ticket-owner check. |
-
-These functions are called by real Django views. Demonstrate them using the
-normal import and attachment pages, then connect the observed behavior to the
-scanner's actual file and line. The pickle test input only prints a marker;
-recording that marker proves Python ran during import even if the file's data
-was rejected afterward. No network-diagnostic example is part of the application.
-
 ## What makes evidence sufficient
 
 - For ownership and approval, include the triggering request, actual returned state, changed server function and a passing regression test. Scanner silence alone is insufficient.
-- For file-operation scanner findings, include tool/rule ID, actual source path/line, the unsafe operation and the corresponding safer function. Report remaining Bandit review warnings rather than claiming every report is empty.
+- For scanner findings, record the rule, actual source location and review outcome.
 - For delegated access, record the selected permissions and the results of denied writes, expiry, replacement and revocation. Never include raw tokens or provider keys. State whether you used browser consent or temporary automated test grants.
 - For NeMo, include input, mode, expected decision, actual decision and stage. Distinguish a policy block from a worker/model failure.
 

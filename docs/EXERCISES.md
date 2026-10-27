@@ -36,15 +36,14 @@ code, and repeat the requests. Use made-up accounts and information throughout.
 ## Exercise index
 
 - [1. Create tickets for Alice and Bob](#1-create-tickets-for-alice-and-bob)
-- [2. Inspect the model's JSON output](#2-inspect-the-models-json-output)
+- [2. Inspect structured model output](#2-inspect-structured-model-output)
 - [3. Fix the acceptance of invalid ticket requests](#3-fix-the-acceptance-of-invalid-ticket-requests)
 - [4. Stop Alice from reading Bob's ticket](#4-stop-alice-from-reading-bobs-ticket)
-- [5. Start the ticket server and call it directly](#5-start-the-ticket-server-and-call-it-directly)
+- [5. Start the ticket server and call it directly](#5-start-the-ticket-mcp-server-and-call-it-directly)
 - [6. Require confirmation before closing a ticket](#6-require-confirmation-before-closing-a-ticket)
-- [7. Authorize the assistant and control its MCP access](#7-authorize-the-assistant-and-control-its-mcp-access)
+- [7. Test assistant permissions, expiry and revocation](#7-test-assistant-permissions-expiry-and-revocation)
 - [8. Run NeMo directly from the terminal](#8-run-nemo-directly-from-the-terminal)
 - [9. Configure a new NeMo rule](#9-configure-a-new-nemo-rule)
-- [10. Fix unsafe ticket imports and attachment downloads](#10-fix-unsafe-ticket-imports-and-attachment-downloads)
 
 ## Get ready
 
@@ -61,6 +60,39 @@ C:\Work\Codepath\Cybersecurity\Session2_Secure_Application_Design_Code_Defense\s
 
 File paths below are relative to that application folder unless stated otherwise.
 Keep your notes in a copy of [Student evidence](NOTES_TEMPLATE.md).
+
+### Every new terminal needs the workshop environment
+
+Activate the existing `.venv` in **every new terminal**, including the second
+terminal for tests, the Django shell, MCP and NeMo. Activation applies only to
+that terminal. Keep the website running in its original terminal.
+
+**Windows PowerShell**, from the repository root:
+
+```powershell
+cd starter
+.\.venv\Scripts\Activate.ps1
+python -c "import sys, mcp, dotenv; print(sys.executable); print(sys.version)"
+```
+
+**Codespaces / macOS / Linux**, from the repository root:
+
+```bash
+cd starter
+source .venv/bin/activate
+python -c "import sys, mcp, dotenv; print(sys.executable); print(sys.version)"
+```
+
+If already in `starter`, skip `cd starter`. The executable must point inside
+`starter/.venv` and report Python **3.12 or 3.13**. After activation, use
+`python ...` for all exercise commands.
+
+If you see missing `mcp` / `dotenv` modules or a Django settings warning, stop.
+Cancel any pending Python prompt with **Ctrl+C**, run `exit()`, activate the
+existing environment in PowerShell or Bash, then reopen `python manage.py shell`.
+Do not reinstall packages or recreate the environment just because you opened a
+new terminal. If PowerShell blocks activation, follow the activation instructions
+in [local setup](LOCAL_SETUP.md) before continuing.
 
 ### Know which program does what
 
@@ -90,7 +122,17 @@ shared default password.
 
 If you lost Alice's password, run this in the second terminal:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py changepassword alice
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py changepassword alice
 ```
 
@@ -127,7 +169,19 @@ list of individual methods.
 
 Run these commands in your second terminal:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_ticket_portal
+python manage.py test tests.test_chat_storage
+python manage.py test tests.test_prompt_security
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_ticket_portal
 python manage.py test tests.test_chat_storage
 python manage.py test tests.test_prompt_security
@@ -154,12 +208,39 @@ features you have not implemented yet.
 
 **Next:** inspect how the model turns your message into a request to read a ticket.
 
-## 2. Inspect the model's JSON output
+<a id="2-inspect-the-models-json-output"></a>
+
+## 2. Inspect structured model output
 
 See what the model sends back when you ask to read a ticket. You will compare
 your message, the instructions sent to Qwen, the model's JSON, and the ticket
 returned by the ticket server. JSON is a text format for named fields and values;
 here it describes which action the application should attempt.
+
+### Structured output: more than JSON syntax
+
+JSON is a data format. Structured output means supplying a **JSON Schema to the
+model provider** to constrain the response: allowed tools, required fields,
+argument types, and rejection of extra fields. A parseable JSON object can still
+have the wrong fields or types.
+
+In `chatbot/planner.py`, Qwen receives `format: step_schema`. Gemini receives
+`response_mime_type: application/json` and `response_json_schema: step_schema`.
+These provider settings are separate from writing “return JSON” in a prompt.
+The schema is narrowed to the tools still needed and those in the user's grant.
+After parsing, `chatbot/agent.py` calls `validate_step(proposal)` before dispatch.
+The server must still enforce scopes, ownership and confirmation. Structured
+output constrains data; it does not authorize execution.
+
+### Before the model request: check assistant access
+
+Exercise 1 grants Alice’s assistant **Read my tickets** for **30 minutes**.
+Website sign-in alone is not enough. If you skipped that step or the grant has
+expired, open **Assistant → Authorize assistant** (or **Manage assistant access**),
+select only **Read my tickets**, choose **30 minutes**, authorize and continue.
+Confirm that `Show my most recent ticket` works in Demo mode before selecting Qwen.
+Exercise 7 revisits this grant to test denial, scope changes, replacement, expiry
+and revocation; do not wait until Exercise 7 to grant initial read access.
 
 ### Ask Qwen to read your latest ticket
 
@@ -265,7 +346,17 @@ Open `tests/test_planner.py`. Read
 Qwen request includes the schema, and `test_bad_model_output_is_rejected`, which
 checks that a response containing `not JSON` causes an error. Then run:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_planner
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_planner
 ```
 
@@ -338,7 +429,17 @@ An **assertion** is a test's check that something happened as expected.
 
 Run the tests in this file:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_validation
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_validation
 ```
 
@@ -444,7 +545,17 @@ with self.assertRaises(PermissionError):
 
 In your second terminal, run:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_ticket_access
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_ticket_access
 ```
 
@@ -496,7 +607,17 @@ previously displayed information.
 
 Run the same test file again:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_ticket_access
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_ticket_access
 ```
 
@@ -510,17 +631,27 @@ Explain why filtering **Your tickets** and checking JSON format were insufficien
 This is **CWE-862: Missing Authorization**: the application identified Alice
 but failed to check whether she had permission to use the requested ticket.
 
-## 5. Start the ticket server and call it directly
+## 5. Start the ticket MCP server and call it directly
 
 Complete Exercise 4 first. Start the MCP process, then use the actual client
 with a token Alice explicitly granted. These calls do not use a model or NeMo.
 
 ### Start the process
 
-In a terminal in the folder containing `manage.py`, with the existing environment
-activated, run:
+Open a second terminal and enter `starter/`, the folder containing `manage.py`.
+Keep the website running in its original terminal. Activate the existing workshop environment in this terminal, then start the process.
 
-```text
+**Windows PowerShell:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python mcp_server/server.py
+```
+
+**Codespaces / macOS / Linux:**
+
+```bash
+source .venv/bin/activate
 python mcp_server/server.py
 ```
 
@@ -538,81 +669,45 @@ connect to the manual process you just stopped.
    The token is shown only in this response. You will paste it into a hidden
    terminal prompt, not into a Python command or your notes.
 
-### Discover the tools and read a ticket
+### Run the MCP exercise script
 
-Run:
+From `starter`, activate the environment in this terminal, then run the script.
+If you are currently at Python's `>>>` prompt, type `exit()` first.
+
+**Windows PowerShell:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python scripts/exercise_mcp.py
+```
+
+**Codespaces / macOS / Linux:**
+
+```bash
+source .venv/bin/activate
+python scripts/exercise_mcp.py
+```
+
+The script prompts only for Alice's authorized token (hidden), connects to MCP,
+and prints the server name and available tool names.
+
+With the read-only grant, expect:
 
 ```text
-python manage.py shell
+Support portal ticket tools
+['list_tickets', 'get_ticket']
 ```
 
-Enter:
+If the grant expired, authorize again in the browser and rerun the script.
 
-```python
-from getpass import getpass
-from django.contrib.auth import get_user_model
-from chatbot.mcp_client import discover, call
-from security.mcp_authorization import use_access_token
-alice = get_user_model().objects.get(username="alice")
-token = getpass("Paste Alice's authorized token (hidden): ")
-with use_access_token(token):
-    service = discover(alice)
+### Find the discovery code
 
-print(service["server"])
-print([tool["name"] for tool in service["tools"]])
-```
-
-After an indented block in the Python shell, press Enter on an empty line to
-execute it. The token prompt does not echo the value. Expect
-`Support portal ticket tools` and only `list_tickets` and `get_ticket` for this
-read-only grant. The client filters tools shown to the model; the server also
-checks permissions independently when operations are requested.
-
-Replace `123` with Alice's recorded ticket number:
-
-```python
-with use_access_token(token):
-    result = call(alice, "get_ticket", {"ticket_id": 123})
-
-print(result)
-```
-
-Expect Alice's ticket number, title and status. Now replace `456` with Bob's
-ticket number:
-
-```python
-with use_access_token(token):
-    call(alice, "get_ticket", {"ticket_id": 456})
-```
-
-Expect `PermissionError`: the ticket is not available to Alice. If it is returned,
-repair the shared owner check from Exercise 4.
-
-### Try an operation that was not authorized
-
-```python
-with use_access_token(token):
-    call(alice, "create_ticket", {"title": "Read-only permission test"})
-```
-
-Expect a permission error explaining that creation was not authorized. No ticket
-should be created. This helper refuses the call before sending it; the independent
-server-side check is also exercised by the integration check in Exercise 7.
-Exit the Python shell with `exit()`. If the grant expires, authorize again in the
-browser and paste the new token into a new `getpass` prompt.
-
-### Find the code responsible
-
-In `chatbot/mcp_client.py`, inspect `StdioServerParameters`, `environment`,
-`session.initialize()`, `session.list_tools()` and `session.call_tool(...)`.
+Open `scripts/exercise_mcp.py` and follow `discover(alice)` into
+`chatbot/mcp_client.py`. Find `session.initialize()` and `session.list_tools()`.
 The token is supplied as `MCP_ACCESS_TOKEN`, outside the model's arguments.
 
-In `mcp_server/server.py`, `actor(scope)` validates the grant and derives its
-user. The shared service in `tickets/ticket_service.py` checks ticket ownership.
-There is no MCP tool for confirming closure; confirmation happens on the ticket page.
-
-**Record:** the startup command, discovered tool names, allowed own-ticket read,
-denied other-user read and denied creation. Do not record the token value.
+**Record:** the startup command, server name and discovered tool names.
+Do not record the token value.
 
 ## 6. Require confirmation before closing a ticket
 
@@ -645,7 +740,17 @@ ticket closes, then tries the same confirmation again and expects refusal.
 
 Run it:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_approval
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_approval
 ```
 
@@ -689,14 +794,29 @@ Read the other approval tests in `tests/test_approval.py`. They try another
 student's confirmation, an expired request and a ticket whose owner changed.
 Run the file's tests, then the tests for the page buttons and forms:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_approval
+python manage.py test tests.test_interface
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_approval
 python manage.py test tests.test_interface
 ```
 
 Expect `OK`. **Record:** the open, pending and closed states and your test results.
 
-## 7. Authorize the assistant and control its MCP access
+## 7. Test assistant permissions, expiry and revocation
+
+You already granted initial read access in Exercise 1 and used it in Exercises 2–6.
+Now deliberately revoke that grant to test the access lifecycle. This is not the
+first authorization step.
 
 Show the difference between signing into the ticket system and granting the
 assistant permission to act for that account. This is a simplified OAuth-style
@@ -763,7 +883,18 @@ environment. The token is not part of the model prompt or tool arguments.
 
 Run:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_authorization
+python scripts/healthcheck.py --secured
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_authorization
 python scripts/healthcheck.py --secured
 ```
@@ -809,8 +940,8 @@ source .venv/bin/activate
 python guardrails/worker.py
 ```
 
-If the second terminal is already in the folder containing `manage.py` with its
-environment activated, run only `python guardrails/worker.py`.
+If the second terminal is already in `starter`, skip `cd starter` and run only
+the activation and worker commands for your platform above.
 
 The process loads NeMo, then waits for input. There is no new shell prompt and
 no browser page to open. Loading may take a few seconds. The current NeMo version
@@ -915,7 +1046,17 @@ program or worker error does not count as a successful block.
 
 Run:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_nemo
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_nemo
 ```
 
@@ -986,7 +1127,17 @@ a worker that is already running.
 
 In the terminal running the website, press **Ctrl+C**, then start it again:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py runserver 127.0.0.1:8000
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py runserver 127.0.0.1:8000
 ```
 
@@ -1010,7 +1161,18 @@ action after that input check.
 
 Run the same tests again:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python manage.py test tests.test_nemo
+python guardrails/compare.py --configured
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python manage.py test tests.test_nemo
 python guardrails/compare.py --configured
 ```
@@ -1022,7 +1184,17 @@ against instruction overrides, forbidden shell actions and secret-shaped output.
 With Ollama running and Qwen available, choose **Qwen** and send the normal
 ticket-reading request again. Then run:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python scripts/healthcheck.py --secured --semantic
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python scripts/healthcheck.py --secured --semantic
 ```
 
@@ -1034,171 +1206,22 @@ results before the change, the passing results afterward and the browser trace.
 If NeMo rejects a harmless message, record a **false positive**. If it allows a
 message your rule should reject, record a **false negative** and inspect the rule.
 
-## 10. Fix unsafe ticket imports and attachment downloads
-
-The ticket system now has two file features: importing a saved ticket request
-and attaching supporting documents to an existing ticket. You will use those
-features in the website, demonstrate two unsafe operations, repair their code,
-and repeat the same actions. Complete the owner checks in Exercise 4 first.
-
-### Import a normal ticket file
-
-1. In Alice's window, open **Your tickets** and click **Import a ticket file**.
-2. Click **Download a JSON example**. Save `ticket-template.json` on your computer.
-   It contains `{"title":"Registration help"}`.
-3. Under **Ticket file**, choose that file and click **Import ticket**.
-4. The new ticket page must show `Registration help`, **Open** status and a new
-   ticket number. The ticket belongs to Alice. The file cannot choose an owner.
-5. Click **Export ticket as JSON** on that ticket page. This saves its title in a
-   file that can be imported again to create another ticket. Imports do not
-   replace existing tickets or preserve their IDs or closed status.
-
-Import files are limited to 64 KB. The accepted data has exactly one field,
-`title`, containing between 1 and 120 characters. The website calls
-`tickets/views.py:ticket_import`, then `tickets/file_imports.py:load_ticket_file`,
-then the shared ticket service to create the ticket. This does not use MCP,
-NeMo or a model.
-
-### Upload and download supporting documents
-
-1. Create a text file named `alice-support.txt` containing `Alice's registration note`.
-2. In Alice's ticket page, find **Attachments**, choose that file, and click
-   **Upload attachment**. Click **Download alice-support.txt** and check its content.
-3. In Bob's private window, create or open Bob's ticket. Create a text file named
-   `bob-support.txt` containing `Bob's private support document`. Upload it there
-   and check that Bob can download it.
-
-Attachments may be PDF, TXT, PNG or JPEG files, up to 2 MB. Their contents are
-saved privately under `uploads/attachments/TICKET_NUMBER/`. The database stores
-which ticket each attachment belongs to, the original filename and a generated
-storage name. There is no public `/uploads/` route. Downloads go through an
-authenticated ticket view and are sent as files to download, not as web pages.
-
-### Demonstrate Python execution while importing a pickle file
-
-**Pickle** is a Python format for saving and rebuilding Python objects. Reading
-a pickle can call Python functions specified by the file. It is not just a
-container of ticket fields. In this application, `pickle.loads(contents)` is
-executed by the ticket-import request. An attacker supplies the file; the
-application runs the function calls while reading it.
-
-1. Open `tickets/file_imports.py` and find the `.pkl` branch and `pickle.loads`.
-2. Open `scripts/create_import_test_file.py`. Its `PrintWhenRead.__reduce__`
-   method describes how to rebuild the object: call `print` with the text
-   `FILE_IMPORT_EXECUTED_CODE`. This demonstration only prints that marker.
-3. In the second terminal, run:
-
-   ```text
-   python scripts/create_import_test_file.py
-   ```
-
-   It prints the full path of `results/import-test.pkl`. Keep the terminal that
-   runs the website visible too; that is where the marker will appear.
-4. In Alice's **Import a ticket file** page, upload `results/import-test.pkl`
-   from your application folder and click **Import ticket**.
-5. Before the repair, the **website terminal** prints `FILE_IMPORT_EXECUTED_CODE`.
-   The page then refuses the data because `print` returned no ticket dictionary.
-   That rejection happened **after Python had already run**. Record both the
-   terminal marker and the browser result; an error page did not prevent execution.
-
-### Demonstrate a download from another ticket's folder
-
-1. In Bob's ticket page, right-click **Download bob-support.txt** and copy its
-   link address. Record the value after `name=` as **Bob's stored filename**.
-   It is generated by the server and differs from `bob-support.txt`.
-2. Return to Alice's window. Use Alice's ticket number in this address, while
-   asking for the file in Bob's folder:
-
-   ```text
-   /tickets/ALICE_NUMBER/attachments/download/?name=../BOB_NUMBER/BOB_STORED_FILENAME
-   ```
-
-   Replace all three labels with the numbers and filename you recorded. Put this
-   path after your website's host, such as `http://127.0.0.1:8000`. Keep `../` in
-   the `name` query value. Stay signed in as Alice.
-3. Before the repair, the download contains `Bob's private support document`,
-   even though the URL starts with Alice's ticket number. The owner check allowed
-   Alice's ticket, but the filename moved the disk read into Bob's folder.
-4. Open `tickets/attachments.py` and find `(folder / name).open('rb')` in
-   `open_attachment`. This is the read that uses the manipulated name.
-
-The `..` component means the parent directory. This flaw is **path traversal**:
-the request changes which directory the application reads instead of staying
-inside the selected ticket's folder.
-
-### Scan the application and read the tests
-
-**Bandit** and **Semgrep** inspect source code for unsafe patterns without running
-the uploaded file. Run:
-
-```text
-python scripts/run_sast.py --save-as before
-python manage.py test tests.test_file_uploads
-python manage.py test tests.test_file_security
-```
-
-Open `results/application/before/semgrep.json`. Find
-`workshop-unsafe-deserialization` in `tickets/file_imports.py` and
-`workshop-path-traversal` in `tickets/attachments.py`. Each report's `path` and
-`start.line` identify the actual code used by the website. Review the Bandit report
-in that folder too. Other findings may remain if earlier repairs are incomplete.
-
-The normal upload tests must pass. Open `tests/test_file_security.py`:
-
-- `test_uploaded_pickle_cannot_execute_python` posts the print-only test file
-  through the real import URL and checks that its marker never runs.
-- `test_download_cannot_read_another_tickets_folder` uploads Bob's document and
-  tries to read it through Alice's ticket URL using `../`.
-- `test_another_user_cannot_upload_or_download_ticket_attachments` checks ordinary
-  cross-user access; the ownership repair from Exercise 4 should already satisfy it.
-
-Before the two file-handling repairs, the first two tests fail. These are separate
-from format checks and ownership checks. The tests use temporary files and records,
-not the documents uploaded in your browser.
-
-### Repair the two file operations and repeat the requests
-
-1. In `tickets/file_imports.py`, remove pickle support entirely. Accept only
-   `.json`, parse it as JSON, and keep the existing `validate_ticket_data` checks.
-   Do not fall back to pickle when JSON parsing fails.
-2. Update the import form's file selector in `tickets/forms.py` and the help text
-   in `tickets/templates/tickets/ticket_import.html` to advertise JSON only.
-3. In `tickets/attachments.py:open_attachment`, resolve the ticket's attachment
-   folder and requested path. Reject a resolved path outside that folder before
-   opening the file. Also require an `Attachment` record matching **both** the
-   selected ticket and generated storage name. Do not treat a missing record as
-   permission to read an arbitrary filename.
-4. Save the files. Upload the ordinary JSON ticket again; it must still create a
-   ticket. Upload the pickle test file again; it must be rejected **without** a
-   new terminal marker. If the file chooser filters out `.pkl`, select **All files**
-   to submit that deliberate rejection test.
-5. Repeat Alice's request for Bob's attachment using the same URL. It must be
-   refused without downloading Bob's document. Alice and Bob must still be able
-   to upload and download files from their own tickets.
-6. Run:
-
-   ```text
-   python manage.py test tests.test_file_uploads tests.test_file_security
-   python scripts/run_sast.py --save-as after
-   python scripts/verify_sast.py --secured
-   ```
-
-Expect all file tests to pass. Compare `results/application/after/` with the saved
-`before` reports. The repaired application must have no workshop Semgrep matches
-or HIGH Bandit findings. Explain remaining review warnings. The final check writes
-`results/application/current/`, preserving both evidence folders.
-
-**Record:** the normal import and attachment results, the terminal marker before
-the repair and its absence afterward, Bob's document being disclosed and then
-refused, the changed source files, test output and scanner reports. **CWE-502**
-describes unsafe deserialization; **CWE-22** describes path traversal. See
-[finding classifications](SECURITY_FINDINGS.md) for the OWASP framing.
-
 ## Finish
 
-Run ordinary own-ticket creation and reading again. They must still work. Then:
+Run ordinary own-ticket creation and reading again. They must still work. Complete
+all repairs, including the new NeMo rule, before the final check:
 
-```text
+**Windows PowerShell · from `starter`:**
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+python scripts/verify_workshop.py --secured
+```
+
+**Codespaces / macOS / Linux · from `starter`:**
+
+```bash
+source .venv/bin/activate
 python scripts/verify_workshop.py --secured
 ```
 
@@ -1207,6 +1230,6 @@ scanner checks. Expect `All requested workshop checks passed.` Add `--semantic`
 to also check live Qwen.
 
 Submit your changed source files, completed evidence notes, test output and
-scanner reports. Exclude `.env`, `.venv/`, `uploads/` and databases. Review reports
+scanner reports. Exclude `.env`, `.venv/` and databases. Review reports
 for secrets before sharing. If submitting a JSON finding, use the required fields
 in `docs/finding.schema.json` at the repository root.

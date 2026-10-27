@@ -19,12 +19,3 @@ class AuditEvent(models.Model):
     tool = models.CharField(max_length=40)
     outcome = models.CharField(max_length=40)
     created_at = models.DateTimeField(auto_now_add=True)
-
-
-class Attachment(models.Model):
-    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='attachments')
-    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    original_name = models.CharField(max_length=255)
-    storage_name = models.CharField(max_length=32, unique=True)
-    size = models.PositiveIntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)

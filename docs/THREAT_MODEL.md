@@ -56,36 +56,6 @@ Application exceptions are labeled separately. The application intentionally lac
 schema/ownership/approval controls identified in the exercises; the shared
 infrastructure must not be mistaken for completed server authorization.
 
-## Uploaded files are a separate input boundary
-
-The ticket-import view reads an uploaded file through `tickets/file_imports.py`
-and asks the shared ticket service to create a new ticket for the authenticated
-user. JSON imports contain only a title. The intentionally unsafe version also
-unpickles `.pkl` uploads; its corrected counterpart accepts JSON only. Parsing a
-pickle can run instructions before any later field validation.
-
-Attachment uploads and downloads use `tickets/attachments.py` after the shared
-service's ticket-access check. Metadata is stored in `Attachment`; file bytes
-are stored privately in `uploads/attachments/<ticket_id>/` under generated names.
-The corrected download checks path containment and the matching attachment record.
-The unsafe download lets the request-controlled name change the directory read.
-Uploads and import data have size limits. Attachments are downloaded with
-Content-Disposition: attachment and X-Content-Type-Options: nosniff. There is no
-public uploads route. These operations require login and normal write requests
-require CSRF protection. Uploaded contents are not supplied to an LLM or NeMo.
-
-```mermaid
-flowchart LR
- U[Signed-in browser] -->|HTTP upload| I[Ticket import view]
- I --> P[tickets/file_imports.py]
- P --> S[Shared ticket service: creates ticket for current user]
- U -->|HTTP upload or download| A[Attachment view]
- A --> O[Shared ticket-owner check]
- O --> F[tickets/attachments.py]
- F --> M[(Attachment metadata in SQLite)]
- F --> B[(Private uploads directory)]
-```
-
 ## Consent is a separate boundary
 
 Signing in does not authorize the assistant. A CSRF-protected consent POST issues

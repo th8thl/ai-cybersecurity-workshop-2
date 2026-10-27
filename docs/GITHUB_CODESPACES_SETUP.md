@@ -31,6 +31,7 @@ Open port **8000** in the **Ports** panel and use `/tickets/` on that website. S
 ## 3. Run tools and exercises
 In a second terminal, `cd starter` and `source .venv/bin/activate`:
 ```bash
+source .venv/bin/activate
 python manage.py test tests.test_ticket_portal
 python manage.py test tests.test_chat_storage
 python manage.py test tests.test_prompt_security
@@ -61,11 +62,9 @@ installing its requirements in your already-selected Python 3.13 environment. Th
 preserves existing settings and passwords; it does not recreate the environment.
 Before repairs use `python scripts/healthcheck.py`. After repairs use `python scripts/healthcheck.py --secured`. Use the exercise-specific checks while your repair is incomplete.
 
-## Updating for ticket file uploads
+### Activate the environment in every exercise terminal
 
-In the existing activated environment, stop the website, run
-`python manage.py migrate`, then use the startup command above. The migration
-adds attachment metadata without replacing accounts or tickets. Imported ticket
-files and attachment controls are described in
-[Exercise 10](EXERCISES.md#10-fix-unsafe-ticket-imports-and-attachment-downloads).
-Never submit the private `uploads/` folder.
+From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
+`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
+all workshop commands. Repeat activation in every new terminal.
+See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).

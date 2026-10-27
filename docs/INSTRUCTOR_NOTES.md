@@ -25,10 +25,10 @@ comes from an AI assistant.
 ## What students do
 
 1. **Use the ticket system.** Students create tickets for Alice and Bob, then ask
-   the assistant to read a ticket. They run tests that repeat these ordinary
+   the assistant to read a ticket after explicitly granting read-only access for 30 minutes. They run tests that repeat these ordinary
    actions. These actions must continue to work after the security repairs.
 
-2. **Inspect the model response.** Students ask Qwen to read their latest ticket,
+2. **Inspect structured model output.** Confirm the read grant from Exercise 1 is active; renew it if expired. Students ask Qwen to read their latest ticket,
    inspect the prompt and three JSON responses in Debug, and compare the selected
    ticket with the server result. They locate the response schema in the code and
    distinguish data format rules from permission checks.
@@ -50,8 +50,9 @@ comes from an AI assistant.
    check that another person cannot use the confirmation and that it cannot be
    used twice.
 
-7. **Authorize the assistant.** Students first use tickets without the
-   assistant, then explicitly grant or deny delegated access. They try read-only
+7. **Test assistant permissions, expiry and revocation.** Students revoke the
+   grant used in Exercises 1–6, verify ordinary tickets still work, then test
+   denial and new grants. They try read-only
    and write permissions, expire or revoke a token, and observe that ticket
    pages remain available. Tokens are per user and client.
 
@@ -64,11 +65,7 @@ comes from an AI assistant.
    the new rule blocks requests for every student's records while allowing a
    student to ask about their own record.
 
-10. **Repair ticket file handling.** Students import ticket files and upload
-   supporting documents through the website. They demonstrate Python execution
-   from a pickle import and another-ticket file read, repair the functions used
-   by those views, and connect scanner findings to the observed behavior. They
-   explain findings rather than treating a scanner's result as proof that the whole application is secure.
+
 
 The activities are planned for about **180 minutes**, excluding installation,
 discussion and troubleshooting. Allow extra time or assign preparation and
@@ -145,7 +142,7 @@ successful run means the starting exercise behaves as intended, **including its
 deliberate security flaws**. It does not mean the application is secure.
 
 Give students a copy of [Student evidence](NOTES_TEMPLATE.md) for their notes.
-Distribute source files, not your `.env`, `.venv/`, `uploads/` or database files.
+Distribute source files, not your `.env`, `.venv/` or database files.
 Those contain installation-specific settings, credentials or data.
 
 ## Keep the tests connected to the activity
@@ -233,11 +230,7 @@ the completed creation and the separate application error.
 solution. Blocking an instruction-override attempt does not establish that the
 server enforces ticket ownership or asks for confirmation.
 
-**The scanner findings come from actual ticket features.** The import and
-attachment pages call the functions being inspected. Students demonstrate the
-harmless pickle marker and the unauthorized file read, repair those functions,
-and compare the before-and-after scanner reports. The working folder contains
-the vulnerable implementation; the answer key contains the repaired one.
+
 
 ## When a student gets stuck
 
@@ -268,3 +261,10 @@ repair exercises each use one short command for their topic file. NeMo's new
 configuration tests intentionally fail until Exercise 9 is completed. The answer
 key has the completed rule and configuration; do not copy them into the student
 application before the exercise.
+
+### Activate the environment in every exercise terminal
+
+From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
+`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
+all workshop commands. Repeat activation in every new terminal.
+See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).

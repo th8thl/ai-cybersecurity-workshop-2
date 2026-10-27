@@ -12,7 +12,7 @@ py -3.13 --version
 It must report Python 3.13.x. If unavailable, install Python 3.13 before continuing.
 The commands below select 3.13 explicitly, regardless of the default `python`.
 
-If `.venv` already exists, check `.\.venv\Scripts\python.exe --version` first.
+If `.venv` already exists, activate it with `.\.venv\Scripts\Activate.ps1`, then run `python --version` first.
 If it reports 3.14, stop: the setup commands below are for a new environment.
 They do not upgrade or convert an existing environment.
 
@@ -25,8 +25,7 @@ py -3.13 -m venv .venv
 python -m pip install -r requirements.txt
 ```
 If PowerShell blocks activation, use Command
-Prompt and `.venv\Scripts\activate.bat`, or call `.venv\Scripts\python.exe`
-directly instead of `python` for the remaining commands.
+Prompt and run `.venv\Scripts\activate.bat`, then use `python` for the remaining commands.
 
 macOS/Linux, from the repository root:
 ```bash
@@ -92,11 +91,9 @@ For an existing checkout, run `python manage.py migrate` once to add the
 authorization table, then restart Django. Users grant access through the browser.
 Before changing code, `python scripts/healthcheck.py` checks that the exercise reproduces the intended flaws. After completing repairs, use `python scripts/healthcheck.py --secured`. Follow the exercise checkpoints for partially repaired code.
 
-## Updating for ticket file uploads
+### Activate the environment in every exercise terminal
 
-In the existing activated environment, stop the website, run
-`python manage.py migrate`, then use the startup command above. The migration
-adds attachment metadata without replacing accounts or tickets. Imported ticket
-files and attachment controls are described in
-[Exercise 10](EXERCISES.md#10-fix-unsafe-ticket-imports-and-attachment-downloads).
-Never submit the private `uploads/` folder.
+From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
+`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
+all workshop commands. Repeat activation in every new terminal.
+See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).

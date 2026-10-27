@@ -9,8 +9,39 @@ files are needed to present them. Live application demonstrations still use the
 workshop application.
 
 Use the arrows or keyboard arrow keys to navigate, the index to jump to a topic,
-and Read view to review all slides. Security and AI buttons show definitions
-for the current slide. The presentation follows all ten workshop exercises.
+and Read view to review all slides. The lock and purple gem icons show definitions
+for the current slide. The presentation follows nine workshop exercises.
+
+## System architecture and trust boundaries
+
+![Workshop system architecture](docs/system-architecture.svg)
+
+This map shows the **repaired design in `solution/`**. The starter deliberately
+omits some enforcement for the exercises. The dashed boundary groups local
+processes on the workshop host; it does not make MCP or NeMo an OS security sandbox.
+
+1. **Browser and consent:** Django authenticates the website session and checks CSRF on writes. The user grants specific assistant scopes for a limited time. This is simplified OAuth-style delegated authorization, not a full OAuth authorization-code / PKCE implementation.
+2. **Chatbot and model:** the agent sends sanitized context to Qwen or Gemini. Model output is an untrusted proposal. The model receives no MCP token and cannot establish the actor or grant itself permissions.
+3. **Guardrails:** the private NeMo worker checks input, tool proposals, tool results and final output. Schema validation and bounded agent execution apply alongside those checks. A guardrail allow decision does not authorize ticket access.
+4. **MCP:** the client starts a local stdio server and passes the token through its process environment. The server hashes it and looks up the grant, checking client, audience, expiry, revocation, active user and operation scope. It derives the actor from that grant.
+5. **Core ticket application:** `tickets/ticket_service.py` checks schema and record ownership, assigns new tickets to the actor and requires human confirmation for closure. Ordinary ticket pages call this same service with the session user; they do not require assistant consent or MCP.
+
+### Where permissions and secrets live
+
+| Item | Location and use |
+| --- | --- |
+| Assistant grant and permissions | Database `MCPAccessGrant`: token hash, user, client ID, audience, scopes, expiry and revocation. `security/mcp_authorization.py` maps tools to scopes and validates grants. |
+| Record permissions and closure approval | `tickets/ticket_service.py` enforces ownership and confirmation using database ticket/approval records. A read scope never grants access to another user's tickets. |
+| Raw MCP token | Browser HttpOnly, SameSite=Lax cookie scoped to `/chatbot/` (Secure when served over HTTPS), Django request context, then child-process `MCP_ACCESS_TOKEN`. The consent page shows it once for the terminal exercise. The grant table stores its SHA-256 hash, not the raw value. |
+| Django secret | Local ignored `.env` / process environment (`DJANGO_SECRET_KEY`), loaded into Django settings and explicitly passed to the MCP child. |
+| Optional Gemini API key | Local ignored `.env` / web-process settings (`GEMINI_API_KEY`); used to authenticate provider requests. It is not forwarded to the MCP or NeMo child and is not prompt content. |
+| NeMo worker configuration | Local `guardrails/` policy/configuration files and Qwen endpoint/model settings. The worker does not receive the MCP token or Gemini key. |
+| User records | Database: password hashes, sessions, tickets, conversations, approvals and audit records. These are data to protect, not model authorization instructions. |
+
+The browser, prompt text and model proposals are untrusted inputs. The server
+trusts validated session/grant records to identify the actor and enforces
+permissions in code. MCP and NeMo run under the local host account; process
+separation alone does not protect the database or `.env` from a compromised host.
 
 ## Start the application after initial setup
 
@@ -39,7 +70,7 @@ First time running the project? Complete [local setup](docs/LOCAL_SETUP.md)
 or [Codespaces setup](docs/GITHUB_CODESPACES_SETUP.md) first.
 
 
-This workshop uses a campus support ticket system with an optional AI assistant.
+This workshop uses a configurable support ticket system with an optional AI assistant.
 Students can create and manage tickets through ordinary forms or ask the assistant
 for help. They find security flaws, repair the Python code and test the results.
 
@@ -63,8 +94,6 @@ tickets/
   models.py               Tickets, approvals and audit records
   ticket_service.py       Shared ticket operations and permissions
   schema.py               Allowed ticket request fields and types
-  file_imports.py         Read uploaded ticket files
-  attachments.py          Store and download ticket attachments
   templates/tickets/      Ticket pages and the shared page layout
 chatbot/
   urls.py                 Assistant and consent routes
@@ -108,14 +137,14 @@ as import aliases. Codespaces uses `0.0.0.0:8000` when starting the website.
 
 ## How the ticket system and assistant connect
 
-```mermaid
-flowchart LR
- W[Ticket forms in Django] --> S[Shared ticket service]
- A[Optional assistant and NeMo] --> C[MCP client]
- C -->|stdio| M[MCP server: user token and permissions]
- M --> S
- S -->|Validation, ownership and confirmation| D[(Ticket database)]
-```
+The ticket application is the core: `tickets/ticket_service.py` owns validation,
+record ownership and human confirmation. The browser's ticket forms call Django
+routes that use this service directly. The chatbot is an optional second entry
+point: its code checks model proposals with NeMo and calls MCP, which validates
+the delegated grant before passing the authenticated actor to the same service.
+
+The [system map above](#system-architecture-and-trust-boundaries) shows these
+separate paths and the locations of consent, credentials and stored records.
 
 Ordinary ticket pages work without MCP, delegated access tokens, NeMo or a model.
 The assistant uses MCP to reach the same ticket service. Both paths enforce the
@@ -156,9 +185,7 @@ The exercises explain them where they are used.
    inspect its allow/block decisions.
 9. Configure NeMo by editing a Python rule, defining its Colang flow and enabling
    it in YAML. Test both prohibited and harmless requests.
-10. Repair unsafe ticket imports and attachment downloads, scan that application
-   code with Bandit and Semgrep, and run the
-   tests and scanner checks automatically through GitHub Actions.
+
 
 Follow the [exercise guide](docs/EXERCISES.md) for the steps and expected results.
 The application supplied to students deliberately has missing checks. The completed
@@ -178,7 +205,7 @@ answer key shows the intended repairs.
 | **JSON Schema and Pydantic** | Define allowed request fields and value types. JSON Schema checks application requests; Pydantic enforces typed MCP parameters. See [schema.py](starter/tickets/schema.py) and [server.py](starter/mcp_server/server.py). |
 | **python-dotenv and Django authorization records** | Load application configuration; store delegated permissions, token hashes, expiry and revocation in SQLite. The browser receives the client token after consent. See [authorization](starter/security/mcp_authorization.py). |
 | **Django's test runner and unittest** | Check normal use, refused requests, confirmations, agent behavior and actual NeMo configuration. All automated test modules are in [tests/](starter/tests/). |
-| **Bandit and Semgrep** | Inspect source code for unsafe patterns. See [scanner script](starter/scripts/run_sast.py), [Semgrep rules](starter/scripts/semgrep.yml) and [ticket imports](starter/tickets/file_imports.py) and [attachment downloads](starter/tickets/attachments.py). |
+| **Bandit and Semgrep** | Inspect source code for unsafe patterns. See [scanner script](starter/scripts/run_sast.py), [Semgrep rules](starter/scripts/semgrep.yml). |
 | **GitHub Actions and Codespaces** | Actions runs tests and scans when changes are pushed. Codespaces provides the configured development environment, including Ollama. See [workflow](.github/workflows/security.yml) and [container configuration](.devcontainer/devcontainer.json). |
 
 ## AI concepts taught and where they appear
@@ -208,7 +235,6 @@ It does not train or fine-tune a model.
 | **Human confirmation and repeated requests** | Closing a ticket requires a confirmation tied to that student and ticket. It expires after five minutes and works once. A database transaction and conditional update prevent reusing it. Exercise 6 repairs this in [ticket_service.py](starter/tickets/ticket_service.py); [approval tests](starter/tests/test_approval.py) check it. |
 | **Access credentials and lifecycle** | Keep model API keys in configuration and delegated tokens out of prompts and logs. User tokens are random, time-limited and revocable; only their hashes are stored in access-grant records. Exercise 7 demonstrates the [consent flow](docs/MCP_AUTHORIZATION.md) and [redaction](starter/security/redaction.py). |
 | **CSRF and safe display of text** | CSRF protection prevents another website from submitting a form using a student's session. Django templates and JavaScript also display untrusted text without treating it as executable HTML. See [web tests](starter/tests/test_web_security.py), [templates](starter/tickets/templates/tickets/) and [chat.js](starter/chatbot/static/chatbot/chat.js). |
-| **Unsafe deserialization and path traversal** | Exercise 10 uses the real ticket-import and attachment-download pages to demonstrate Python execution from an uploaded pickle and reading another ticket's file. Students repair [file imports](starter/tickets/file_imports.py) and [attachment handling](starter/tickets/attachments.py), then rerun HTTP tests and scanners. |
 | **OWASP and CWE** | CWE names a specific weakness; OWASP groups broader application-security risks. Students use them to explain findings and repairs in their reports. See [worked findings](docs/SECURITY_FINDINGS.md) and [evidence template](docs/NOTES_TEMPLATE.md). |
 | **Automated tests, SAST and continuous integration** | Tests check behavior. Static Application Security Testing (SAST) inspects source code. Continuous integration runs these checks automatically after code changes. Students use [tests](starter/tests/), [scanner checks](starter/scripts/verify_sast.py) and the [GitHub workflow](.github/workflows/security.yml). Neither passing tests nor a clean scan establishes security beyond the cases actually checked. |
 
@@ -246,7 +272,7 @@ with **Ctrl+C**. A manually started process cannot access tickets until you
 supply a user token from the consent page.
 
 The website normally starts the server automatically with the consenting user's token.
-The [MCP exercise](docs/EXERCISES.md#5-start-the-ticket-server-and-call-it-directly)
+The [MCP exercise](docs/EXERCISES.md#5-start-the-ticket-mcp-server-and-call-it-directly)
 shows manual startup, action discovery, an authenticated ticket read and requests
 the server must refuse. Its client starts its own server process rather than
 connecting to a manually opened terminal.
@@ -262,4 +288,15 @@ connecting to a manually opened terminal.
 
 Each application folder has one `requirements.txt` for its dependencies and one
 `tests/` folder for its tests. Use the existing Python environment for all exercises.
-Keep `.env`, `.venv/`, `uploads/` and database files out of Git and submissions.
+Keep `.env`, `.venv/` and database files out of Git and submissions.
+
+### Activate the environment in every exercise terminal
+
+From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
+`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
+all workshop commands. Repeat activation in every new terminal.
+See [exercise terminal instructions](docs/EXERCISES.md#every-new-terminal-needs-the-workshop-environment).
+
+## Change the support scenario
+
+See [theme configuration](docs/THEMES.md). The selected theme drives the portal, assistant UI, planner context and demo vocabulary.

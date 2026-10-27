@@ -56,6 +56,7 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
+                "support_portal.context_processors.workshop_theme",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
@@ -132,7 +133,3 @@ if WORKSHOP_DB:
 
 NEMO_POLICY_MODE = os.getenv("NEMO_POLICY_MODE", "semantic")
 
-# Private ticket uploads are served only by authenticated ticket views.
-MEDIA_ROOT = BASE_DIR / "uploads"
-TICKET_MAX_IMPORT_BYTES = 64 * 1024
-TICKET_MAX_ATTACHMENT_BYTES = 2 * 1024 * 1024

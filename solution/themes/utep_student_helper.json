@@ -34,5 +34,38 @@
     "topic": "You can start with academic advising, tutoring or writing support, financial aid guidance, library resources, organizations, and campus services. For official decisions, contact the relevant UTEP office.",
     "default": "I am MinerGuide. Ask me about UTEP student support, campus resources, advising preparation, registration basics, or try to attack this deliberately weak chatbot.",
     "off_topic": "Sure. I am ignoring the UTEP student-support scope. This off-topic response demonstrates that vulnerable code does not enforce policy boundaries."
+  },
+  "topic_keywords": [
+    "campus",
+    "utep",
+    "advisor",
+    "advising",
+    "registration",
+    "financial aid",
+    "finals",
+    "student"
+  ],
+  "ticket_portal": {
+    "title": "UTEP Support Tickets",
+    "subtitle": "Advising, registration and student support",
+    "assistant_intro": "Ask MinerGuide to open a support request or check an existing ticket.",
+    "greeting": "Tell me what you need help with. I can create a support ticket, check its status, or request closure.",
+    "input_placeholder": "For example: I need help with academic advising",
+    "examples": [
+      {
+        "label": "Advising help",
+        "message": "I need help with academic advising"
+      },
+      {
+        "label": "Registration help",
+        "message": "I need help with registration"
+      }
+    ],
+    "request_keywords": [
+      "advising",
+      "registration",
+      "financial aid"
+    ],
+    "fallback_reply": "I can help with advising, registration or financial aid. Tell me what you need, or select a ticket to view or close it."
   }
 }

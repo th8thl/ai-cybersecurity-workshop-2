@@ -22,7 +22,7 @@ jobs:
       - name: Configured NeMo rules
         working-directory: solution
         run: python guardrails/compare.py --configured
-      - name: Confirm scanners detect unsafe application file operations
+      - name: Scan the starter application boundaries
         working-directory: starter
         run: python scripts/verify_sast.py
       - name: Check repaired ticket application

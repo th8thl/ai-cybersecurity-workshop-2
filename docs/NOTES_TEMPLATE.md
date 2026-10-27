@@ -12,7 +12,7 @@ Fill this in as you complete the linked exercises. Do not include passwords, API
 - `tests.test_chat_storage` result:
 - `tests.test_prompt_security` result:
 
-## Model JSON — Exercise 2
+## Structured model output — Exercise 2
 
 - Message sent to Qwen:
 - Instruction and response schema found in the prompt:
@@ -101,15 +101,6 @@ Record test output for another student trying to confirm, an expired confirmatio
 - Live Qwen check result, or reason it could not run:
 - False positives or false negatives observed:
 
-## Scanner evidence — Exercise 10
-
-| Tool / finding ID | Actual source file and line | Why the line is unsafe | Safer replacement | CWE / OWASP category | Rescan evidence |
-|---|---|---|---|---|---|
-| Unsafe deserialization | | | | | |
-| Path traversal | | | | | |
-
-- Application warnings that still require review:
-- What does a clean scan fail to establish about ticket ownership/approval?
 
 ## Final verification
 
@@ -119,14 +110,3 @@ Record test output for another student trying to confirm, an expired confirmatio
 - Source files and report files submitted:
 
 For a machine-readable finding, use `docs/finding.schema.json` from the repository root. Its required fields are `title`, `cwe`, `file`, `line`, `evidence` and `recommendation`; use actual source lines and observations.
-
-## Ticket file handling — Exercise 10
-
-- JSON import ticket number and owner:
-- Exported file successfully imported again:
-- Alice and Bob attachment names and ticket numbers:
-- Pickle terminal marker before repair / absent afterward:
-- Alice's manipulated download request and result before / after repair:
-- Changes in tickets/file_imports.py and tickets/attachments.py:
-- tests.test_file_uploads and tests.test_file_security results:
-- Before / after scanner report locations and remaining warnings:

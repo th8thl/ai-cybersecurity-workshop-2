@@ -110,16 +110,8 @@ tickets until an authorized client provides one.
 
 For ordinary website use, no separate server command is needed: the application
 starts the MCP process and supplies the user's token for each request. Follow the
-[MCP exercise](../docs/EXERCISES.md#5-start-the-ticket-server-and-call-it-directly)
-to discover the available actions, read a ticket and check refused requests.
+[MCP exercise](../docs/EXERCISES.md#5-start-the-ticket-mcp-server-and-call-it-directly)
+to discover the available tools.
 The exercise client starts a new server process; it does not attach to the
 terminal opened by the command above.
 
-## Ticket imports and attachments
-
-Use **Import a ticket file** on the ticket list. Use **Attachments** and
-**Export ticket as JSON** on a ticket page. The code is in `tickets/file_imports.py`
-and `tickets/attachments.py`, not a separate example folder. See
-[the file-security walkthrough](../docs/EXERCISES.md#10-fix-unsafe-ticket-imports-and-attachment-downloads).
-After updating an existing installation, run `python manage.py migrate` once
-before restarting the website. Keep `uploads/` out of Git and submissions.

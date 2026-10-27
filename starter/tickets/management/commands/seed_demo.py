@@ -13,5 +13,5 @@ class Command(BaseCommand):
                 user.set_password(password)
                 user.save()
                 self.stdout.write(f"{name} password: {password} (save for this lab)")
-            ticket, _ = Ticket.objects.get_or_create(owner=user, title=f"{name.title()}: advising request")
+            ticket, _ = Ticket.objects.get_or_create(owner=user, title=f"{name.title()}: support request")
             self.stdout.write(f"{name}: ticket {ticket.pk}")
