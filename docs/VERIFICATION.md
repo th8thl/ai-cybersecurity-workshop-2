@@ -6,7 +6,7 @@ human confirmation, delegated MCP authorization and NeMo guardrails.
 
 From `starter` or `solution`, activate that folder's environment, then run:
 
-```text
+```bash
 python scripts/verify_workshop.py
 ```
 

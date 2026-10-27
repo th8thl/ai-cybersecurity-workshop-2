@@ -45,15 +45,7 @@ separation alone does not protect the database or `.env` from a compromised host
 
 ## Start the application after initial setup
 
-**Windows PowerShell:**
-
-```powershell
-cd C:\Work\Codepath\Cybersecurity\Session2_Secure_Application_Design_Code_Defense\starter
-.\.venv\Scripts\Activate.ps1
-python manage.py runserver 127.0.0.1:8000
-```
-
-Open [Your tickets](http://127.0.0.1:8000/tickets/). Keep this terminal running;
+Open port **8000** in the Codespaces **Ports** panel, then visit `/tickets/`. Keep this terminal running;
 Ctrl+C stops the website. Assistant actions start the MCP server automatically. Ordinary ticket pages use the shared ticket service directly.
 
 **Codespaces:** from the repository root:
@@ -66,8 +58,7 @@ python manage.py runserver 0.0.0.0:8000
 
 Open port **8000** in the **Ports** panel, then visit `/tickets/`.
 
-First time running the project? Complete [local setup](docs/LOCAL_SETUP.md)
-or [Codespaces setup](docs/GITHUB_CODESPACES_SETUP.md) first.
+First time running the project? Complete [Codespaces setup](docs/GITHUB_CODESPACES_SETUP.md) first.
 
 
 This workshop uses a configurable support ticket system with an optional AI assistant.
@@ -123,9 +114,9 @@ The main dispatcher routes `/tickets/` to `tickets/urls.py` and `/chatbot/` to
 
 Stop the website with Ctrl+C. In the same activated environment, run:
 
-```text
+```bash
 python manage.py migrate
-python manage.py runserver 127.0.0.1:8000
+python manage.py runserver 0.0.0.0:8000
 ```
 
 The initial `tickets` migration creates tables for a new installation or renames
@@ -240,25 +231,16 @@ It does not train or fine-tune a model.
 
 ## Get started
 
-Choose [local setup](docs/LOCAL_SETUP.md) or [GitHub Codespaces setup](docs/GITHUB_CODESPACES_SETUP.md),
+Complete [Codespaces setup](docs/GITHUB_CODESPACES_SETUP.md),
 then follow [Exercises](docs/EXERCISES.md). Codespaces installs the dependencies,
 starts Ollama and downloads the configured Qwen model.
 
-The application opens at **http://127.0.0.1:8000/tickets/** locally. Create and
-manage requests there. **Assistant** in the navigation opens the optional chat.
+Open port **8000** in the Codespaces **Ports** panel, then visit `/tickets/` to create and manage requests. **Assistant** in the navigation opens the optional chat.
 
 ## Start the MCP ticket server yourself
 
 After setup, you can start the ticket server directly. From the repository root,
-use these PowerShell commands:
-
-```powershell
-cd starter
-.\.venv\Scripts\Activate.ps1
-python mcp_server/server.py
-```
-
-In Codespaces or macOS/Linux:
+run these commands in the Codespaces Bash terminal:
 
 ```bash
 cd starter
@@ -292,8 +274,7 @@ Keep `.env`, `.venv/` and database files out of Git and submissions.
 
 ### Activate the environment in every exercise terminal
 
-From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
-`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
+From `starter`, run `source .venv/bin/activate` in the Codespaces terminal. Then use `python ...` for
 all workshop commands. Repeat activation in every new terminal.
 See [exercise terminal instructions](docs/EXERCISES.md#every-new-terminal-needs-the-workshop-environment).
 

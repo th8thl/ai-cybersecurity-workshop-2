@@ -6,15 +6,7 @@ Code is organized into `support_portal/` (Django settings and main routes), `tic
 
 ## Start the application after initial setup
 
-**Windows PowerShell:**
-
-```powershell
-cd C:\Work\Codepath\Cybersecurity\Session2_Secure_Application_Design_Code_Defense\starter
-.\.venv\Scripts\Activate.ps1
-python manage.py runserver 127.0.0.1:8000
-```
-
-Open [Your tickets](http://127.0.0.1:8000/tickets/). Keep this terminal running;
+Open port **8000** in the Codespaces **Ports** panel, then visit `/tickets/`. Keep this terminal running;
 Ctrl+C stops the website. Assistant actions start the MCP server automatically. Ordinary ticket pages use the shared ticket service directly.
 
 **Codespaces:** from the repository root:
@@ -27,17 +19,16 @@ python manage.py runserver 0.0.0.0:8000
 
 Open port **8000** in the **Ports** panel, then visit `/tickets/`.
 
-First time running the project? Complete [local setup](../docs/LOCAL_SETUP.md)
-or [Codespaces setup](../docs/GITHUB_CODESPACES_SETUP.md) first.
+First time running the project? Complete [Codespaces setup](../docs/GITHUB_CODESPACES_SETUP.md) first.
 
 
 Run and repair the code in this folder. `solution/` is the instructor's answer key; you do not need to configure or run it.
 
-1. Complete **one** setup guide: [local computer](../docs/LOCAL_SETUP.md) or [GitHub Codespaces](../docs/GITHUB_CODESPACES_SETUP.md).
+1. Complete **one** setup guide: [GitHub Codespaces](../docs/GITHUB_CODESPACES_SETUP.md).
 2. Follow [the exercise walkthrough](../docs/EXERCISES.md) in order. It gives the login procedure, exact inputs, code changes, test commands, expected results and evidence to record.
 3. Keep your notes in a copy of [Student evidence](../docs/NOTES_TEMPLATE.md).
 
-Start at **http://127.0.0.1:8000/tickets/** locally, or `/tickets/` on the forwarded Codespaces website. Use **New ticket** to create a request and open it to manage its status. **Assistant** in the navigation opens the optional chatbot at `/chatbot/`. Enter sends a message; Shift+Enter adds a line. Conversation links open new tabs. Debug shows the actual model prompts, tool requests and errors.
+Open port **8000** in the Codespaces **Ports** panel and visit `/tickets/`. Use **New ticket** to create a request and open it to manage its status. **Assistant** in the navigation opens the optional chatbot at `/chatbot/`. Enter sends a message; Shift+Enter adds a line. Conversation links open new tabs. Debug shows the actual model prompts, tool requests and errors.
 
 **Demo · no model needed** requires no model download or API key. **Qwen · local AI** requires Ollama and the model prepared by your setup guide. Both modes use the real ticket server and NeMo runtime.
 
@@ -56,7 +47,7 @@ and a duration. Ordinary ticket pages work independently. See
 With this folder's existing Python environment active, run from the folder
 containing `manage.py`:
 
-```text
+```bash
 python mcp_server/server.py
 ```
 

@@ -1,97 +1,44 @@
-# Set up the workshop
+# Set up the workshop in Codespaces
 
-**You will work in `starter/`. `solution/` is the completed answer key;
-leave it alone until the final comparison.**
+Use [Codespaces setup](GITHUB_CODESPACES_SETUP.md), then complete its Ollama
+validation checks before Exercise 1. Work in `starter`; `solution` is the answer key.
 
-Choose the instructions for where you will run the workshop:
-- [GitHub Codespaces](GITHUB_CODESPACES_SETUP.md)
-- [Your computer: Windows, macOS or Linux](LOCAL_SETUP.md)
+## Terminal names and activation
 
-Both instructions prepare `starter/` and install everything needed for the
-exercises, including Bandit, Semgrep and NeMo. Codespaces also installs Ollama
-and downloads Qwen automatically; the local instructions explain how to install it.
+Right-click a terminal tab → **Rename**. Use **Website** for Django, **Tests**
+for commands, and **NeMo** for Exercise 8's worker. Activate each new terminal:
 
-## Files created by setup
-- `starter/.venv/`: the Python environment used to run the workshop.
-- `starter/.env`: Django/model settings and any optional Gemini API key.
-- `starter/db.sqlite3`: the local database containing synthetic workshop data.
-
-
-Do not commit these files or enter real student data. Setup preserves existing
-settings and passwords when you run it again.
-
-## Validate Ollama before the exercises
-
-Complete the generation and application-configuration checks in [local setup](LOCAL_SETUP.md#validate-ollama-before-starting-the-exercises) or [Codespaces setup](GITHUB_CODESPACES_SETUP.md#2-validate-ollama). Installing Ollama alone does not verify that its server and model work.
-
-## Website addresses and first use
-
-- **Ticket list / landing page:** http://127.0.0.1:8000/tickets/
-- **Create a ticket:** http://127.0.0.1:8000/tickets/new/
-- **Ticket detail:** `/tickets/NUMBER/`, for example http://127.0.0.1:8000/tickets/5/
-- **Optional assistant:** http://127.0.0.1:8000/chatbot/
-- Opening http://127.0.0.1:8000/ takes you to the ticket list. Signing in also lands there unless you were opening a specific protected page.
-
-In Codespaces use the same paths on your forwarded port 8000 website. Sign in as
-`alice` using the password printed during setup. Click **New ticket**, enter a
-**Request summary**, then click **Create ticket**. View and manage its status on
-the resulting detail page. Use **Assistant** in the navigation when you want chat
-help; ordinary ticket operations do not require a model or conversation.
-
-Follow [Exercises](EXERCISES.md) for the classroom sequence. Some security tests
-intentionally fail before repair; setup and connection errors are not intentional.
-
-## Lost demo password
-From `starter/`, with `.venv` activated, run:
-```
-python manage.py changepassword alice
+```bash
+cd starter
+source .venv/bin/activate
 ```
 
-## Verify setup without changing your workshop data
-In the folder containing `manage.py`, with the existing Python environment active:
+Skip `cd starter` if already there. Start Django in Website:
+
+```bash
+python manage.py runserver 0.0.0.0:8000
 ```
-python scripts/verify_workshop.py
+
+Open port **8000** in the **Ports** panel and visit `/tickets/` on its forwarded
+website. Keep Website running while using Tests for commands.
+
+## Demo logins
+
+In Tests, after activation:
+
+```bash
+python manage.py seed_demo --show-passwords
 ```
-Before you change the code, this checks normal ticket use, existing protections, the known flaws and the code-scanner results. Do not use the default command to judge partially repaired code; follow the exercise-specific checkpoints.
-Add `--semantic` to exercise local Qwen too. After completing the security repairs,
-use `python scripts/verify_workshop.py --secured` to require the full security contract.
 
-## Returning to the workshop another day
+For old demo accounts whose passwords were never saved, explicitly run
+`python manage.py seed_demo --reset-passwords` once to generate and print new
+Alice/Bob passwords. Later, `--show-passwords` displays them without changing them.
 
-Setup is done once. On later days, activate the existing environment and start
-the server using the command in your local or Codespaces guide. When using Qwen,
-Ollama must also be running. Keep the existing environment and account passwords.
+## Exercises and returning later
 
-The assistant requires user consent. After signing in, open **Assistant →
-Authorize assistant** and select permissions and a duration. The browser receives
-the client's token, and the database stores its hash and authorization record.
-When access expires or is revoked, authorize again; do not recreate the Python
-environment or reset account passwords. Ordinary ticket pages remain available.
-See [the consent flow](MCP_AUTHORIZATION.md).
-
-## Opening links from chat
-Every link inside the conversation opens in a new browser tab. Keep the chatbot tab open and switch back to it after inspecting a ticket. This applies to existing messages and newly received replies.
-
-### Activate the environment in every exercise terminal
-
-From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
-`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
-all workshop commands. Repeat activation in every new terminal.
-See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).
-
-## Demo passwords and terminal names
-
-Setup saves only its generated Alice/Bob demo passwords in the local ignored
-`starter/.env`. Codespaces prints the saved login summary on attach. In the
-**Tests** terminal, activate `.venv`, then run `python manage.py seed_demo --show-passwords`
-to display those logins again without changing accounts or tickets.
-For an older workshop copy whose passwords were never saved, explicitly run
-`python manage.py seed_demo --reset-passwords` once. This changes the Alice/Bob
-demo passwords and prints the new ones. After that, `--show-passwords` reprints
-them without changing accounts. Setup never silently resets existing passwords.
-
-In Codespaces right-click each terminal tab and choose **Rename**: use **Website**
-for Django, **Tests** for commands, and **NeMo** for Exercise 8's worker. Activate
-the environment in each terminal. The starter starts with `NEMO_ENABLED=False`;
-Exercise 8 sets it to `True`. Keep `NEMO_POLICY_MODE=deterministic` for Exercises
-8–9 so the new content flow, rather than the semantic classifier, explains the result.
+Follow [the exercises](EXERCISES.md). Qwen is the default. The starter begins with
+NeMo off; Exercise 8 enables it, and Exercise 9 adds the deterministic content flow.
+On later days, activate the existing environment and start Django again; do not
+recreate it. Follow [Ollama validation](GITHUB_CODESPACES_SETUP.md#2-validate-ollama)
+if the model server is unavailable. Assistant grants can expire independently of
+website sign-in; renew them through **Authorization** when prompted.

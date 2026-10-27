@@ -4,7 +4,6 @@ import re
 from urllib import request, error
 from django.conf import settings
 from chatbot.ai_client import AIClientError
-from chatbot.prompt_security import defended_response_for
 from tickets.schema import PLAN_SCHEMA
 from support_portal.theme import portal_theme
 from security.redaction import sanitize
@@ -43,8 +42,6 @@ def plan(message, provider, context=None, debug=None):
     if not isinstance(message, str) or not 1 <= len(message.strip()) <= 2000:
         raise ValueError("Enter a message between 1 and 2000 characters.")
     message = sanitize(message)
-    if defended_response_for(message):
-        raise ValueError("Session 1 input guardrail blocked this request.")
     context = context or {}
     intent = ticket_request(message)
     if provider == "mock":

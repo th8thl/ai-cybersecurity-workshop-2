@@ -30,7 +30,7 @@ on later Codespace restarts. Ports 8000/8001 are private; 11434 is not forwarded
 
 In a terminal, run:
 
-```text
+```bash
 ollama --version
 ollama list
 ollama run qwen3:0.6b-q4_K_M "Reply with one word: READY"
@@ -46,7 +46,8 @@ Check all three results:
 From `starter`, activate `.venv` in this terminal, then confirm the application's
 model settings (this command prints only the model name and endpoint):
 
-```text
+```bash
+source .venv/bin/activate
 python manage.py shell -c "from django.conf import settings; print(settings.QWEN_MODEL, settings.QWEN_API_URL)"
 ```
 
@@ -104,8 +105,7 @@ Before repairs use `python scripts/healthcheck.py`. After repairs use `python sc
 
 ### Activate the environment in every exercise terminal
 
-From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
-`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
+From `starter`, run `source .venv/bin/activate` in the Codespaces terminal. Then use `python ...` for
 all workshop commands. Repeat activation in every new terminal.
 See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).
 

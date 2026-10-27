@@ -66,7 +66,6 @@ comes from an AI assistant.
    student to ask about their own record.
 
 
-
 The activities are planned for about **180 minutes**, excluding installation,
 discussion and troubleshooting. Allow extra time or assign preparation and
 follow-up work if the class period is shorter.
@@ -100,8 +99,7 @@ Use an unchanged copy of `starter/`. Keep `solution/` as the completed answer ke
 If your own application has already been repaired, it will no longer demonstrate the
 original problems. Do not reset a student's working copy to recreate them.
 
-Follow either the [local setup guide](LOCAL_SETUP.md) or the
-[Codespaces setup guide](GITHUB_CODESPACES_SETUP.md). Then verify the following:
+Follow the [Codespaces setup guide](GITHUB_CODESPACES_SETUP.md). Then verify the following:
 
 - Signing in opens **Your tickets** at `/tickets/`.
 - Alice and Bob can each create and view a ticket using the ordinary ticket form.
@@ -115,7 +113,7 @@ printed. These passwords sign users into the website. Assistant access is grante
 
 From `starter/`, with its existing Python environment active, run:
 
-```text
+```bash
 python manage.py test tests.test_ticket_portal
 python manage.py test tests.test_chat_storage
 python manage.py test tests.test_prompt_security
@@ -127,7 +125,7 @@ them does not mean the missing ownership and confirmation rules are implemented.
 
 Then run:
 
-```text
+```bash
 python scripts/healthcheck.py
 ```
 
@@ -186,7 +184,7 @@ tests listed in their current exercise.
 
 After the ownership and confirmation repairs are complete, run:
 
-```text
+```bash
 python scripts/healthcheck.py --secured
 ```
 
@@ -196,7 +194,7 @@ script still expects the original vulnerabilities.
 
 After students finish the repairs, run the final check:
 
-```text
+```bash
 python scripts/verify_workshop.py --secured
 ```
 
@@ -228,7 +226,6 @@ the completed creation and the separate application error.
 
 **NeMo supplements the permission checks.** The starter enables it in Exercise 8; the solution includes it enabled. Blocking an instruction-override attempt does not establish that the
 server enforces ticket ownership or asks for confirmation.
-
 
 
 ## When a student gets stuck
@@ -263,8 +260,7 @@ application before the exercise.
 
 ### Activate the environment in every exercise terminal
 
-From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
-`source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
+From `starter`, run `source .venv/bin/activate` in the Codespaces terminal. Then use `python ...` for
 all workshop commands. Repeat activation in every new terminal.
 See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).
 
