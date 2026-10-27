@@ -2,7 +2,8 @@
 import json
 from django.conf import settings
 from .mcp_client import discover, MODEL_TOOLS
-from security.mcp_authorization import require_authorization
+from .planner import explicit_creation_request, ticket_request
+from security.mcp_authorization import require_authorization, TOOL_SCOPES
 from tickets.schema import validate_step, SCHEMA
 from .tool_policy import execute
 from tickets.presentation import describe
@@ -17,7 +18,7 @@ def model_history(history):
     """Failed requests stay visible in the UI, but are not model examples."""
     completed = []
     for item in history:
-        failed = item.get("error") or item.get("role") == "error"
+        failed = item.get("error") or item.get("blocked") or item.get("role") == "error"
         if failed:
             if completed and completed[-1].get("role") == "user":
                 completed.pop()
@@ -32,6 +33,12 @@ def run(actor, message, provider, history, last_ticket_id=None, planner=None, tr
         planner = plan
     require_authorization(actor)
     message = sanitize(message)
+    intent = ticket_request(message)
+    creating = explicit_creation_request(message)
+    if intent:
+        require_authorization(actor, TOOL_SCOPES[intent["tool"]])
+        if intent.get("latest"):
+            require_authorization(actor, "tickets:read")
     trace = [] if trace is None else trace
     check("input", sanitize(message), provider, trace)
     manifest = discover(actor)
@@ -52,6 +59,10 @@ def run(actor, message, provider, history, last_ticket_id=None, planner=None, tr
             reply = sanitize(describe(last_result, last_tool) if last_result is not None else proposal['reply'])
             check("output", reply, provider, trace)
             return {"reply":reply,"result":last_result,"trace":trace,"last_ticket_id":last_ticket_id,"tool":last_tool}
+        if intent and "ticket_id" in intent and (proposal["tool"] != intent["tool"] or proposal["arguments"].get("ticket_id") != intent["ticket_id"]):
+            raise ValueError("The model proposed a different ticket or operation than requested.")
+        if creating and proposal["tool"] != "create_ticket":
+            raise ValueError("The model proposed a different operation than the requested ticket creation.")
         if len(observations) >= MAX_TOOL_CALLS:
             raise ValueError("Agent tool-call budget reached.")
         fingerprint = json.dumps(proposal,sort_keys=True)

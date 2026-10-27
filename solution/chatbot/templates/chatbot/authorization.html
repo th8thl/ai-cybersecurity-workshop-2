@@ -9,7 +9,7 @@ Use the ticket page to review and confirm closure requests.</p>
 {% if issued_token %}<div class="notice"><strong>Access granted.</strong> The client received a token for your selected permissions.</div>
 <p>Expires: {{ authorization.expires_at|date:"Y-m-d H:i:s T" }}.</p>
 <ul>{% for label in permission_labels %}<li>{{ label }}</li>{% endfor %}</ul>
-<p><a class="button" href="{% url 'assistant' %}">Continue to assistant</a></p>
+<p><a class="button" href="{% url 'assistant' %}">Continue to assistant</a> <a class="button secondary" href="{% url 'assistant_authorization' %}">Back to authorization</a></p>
 <details><summary>Inspect the token for the terminal exercise</summary>
 <p>This token is shown only in this response. Treat it as a password; do not include it in prompts, reports or screenshots.</p>
 <textarea readonly rows="3" aria-label="Access token shown once">{{ issued_token }}</textarea>

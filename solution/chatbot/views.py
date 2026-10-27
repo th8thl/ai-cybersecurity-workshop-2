@@ -1,3 +1,4 @@
+from django.conf import settings
 import json
 import logging
 from datetime import timedelta
@@ -21,11 +22,22 @@ from tickets.presentation import describe
 
 logger = logging.getLogger(__name__)
 
+def selected_provider(request):
+    # Apply the new default once, including sessions that previously saved Demo.
+    if request.session.get("qwen_default_applied") != 2:
+        if request.session.get("action_provider") in {None, "mock"}:
+            request.session["action_provider"] = "qwen"
+        request.session["qwen_default_applied"] = 2
+    return request.session.get("action_provider", "qwen")
+
+
 def context(request):
     grant, authorization_error = authorization_status(request.user)
     history = sanitize(request.session.get("action_history", []))
     return {
         "history": history,
+        "nemo_enabled": settings.NEMO_CHECKS,
+        "nemo_mode": settings.NEMO_POLICY_MODE,
         "authorization":grant, "authorization_error":authorization_error,
         "permission_labels":[PERMISSIONS[p] for p in grant.scopes] if grant else [],
         "form_token": str(uuid4()),
@@ -34,7 +46,7 @@ def context(request):
             created_at__gte=timezone.now()-timedelta(minutes=5), ticket__owner=request.user,
             ticket__status="open").select_related("ticket"),
         "events": AuditEvent.objects.filter(actor=request.user).order_by("-id")[:20],
-        "selected_provider": request.session.get("action_provider", "mock"),
+        "selected_provider": selected_provider(request),
         "inspection": request.session.get("action_inspection", ""),
         "prompts": request.session.get("action_prompts", "Send a message to see the exact prompts used for each model step. Demo mode does not call a model."),
     }
@@ -54,9 +66,9 @@ def chat(request):
             return redirect("assistant")
         if token:
             request.session["last_action_submission"] = token
-        provider = request.POST.get("provider", request.session.get("action_provider", "mock"))
+        provider = request.POST.get("provider", selected_provider(request))
         if provider not in {"mock", "qwen", "gemini"}:
-            provider = "mock"
+            provider = "qwen"
         request.session["action_provider"] = provider
         message = request.POST.get("message", "").strip()[:2000]
         tool = ""
@@ -138,6 +150,10 @@ def chat(request):
         history.append({"role":"error" if error else "assistant", "text":sanitize(reply),
             "error":bool(error), "source":"ticket" if result is not None and not error else "ai",
             "ticket_id":result.get("ticket_id") if result is not None and not error else None})
+        if blocked_by_guardrail:
+            history.append({"role":"assistant", "text":settings.CHATBOT_THEME.get("guardrail_reply",
+                "I couldn’t complete that request safely. I can help with tickets you’re allowed to use. Please try a request about your own tickets, or use the Tickets page."),
+                "source":"guardrail", "blocked":True, "error":False})
         request.session["action_history"] = history[-30:]
     data = context(request)
     data.update({"error":error, "result":json.dumps(result, indent=2) if result else ""})

@@ -31,5 +31,6 @@
         "ms-python.vscode-pylance"
       ]
     }
-  }
+  },
+  "postAttachCommand": "bash .devcontainer/show-demo-logins.sh"
 }

@@ -64,6 +64,39 @@ The list must contain `qwen3:0.6b-q4_K_M` (approximately 522 MB). Select **Qwen 
 in the workshop console. `starter/.env` already points to this model at localhost:11434. The same
 model serves the NeMo exercise.
 
+### Validate Ollama before starting the exercises
+
+In a terminal, run:
+
+```text
+ollama --version
+ollama list
+ollama run qwen3:0.6b-q4_K_M "Reply with one word: READY"
+```
+
+Check all three results:
+
+1. `ollama --version` prints a version: the command is installed.
+2. `ollama list` connects to the server and lists `qwen3:0.6b-q4_K_M`.
+3. `ollama run` generates a reply. The wording need not match exactly; a connection
+   error, missing-model error or empty response is not a successful check.
+
+From `starter`, activate `.venv` in this terminal, then confirm the application's
+model settings (this command prints only the model name and endpoint):
+
+```text
+python manage.py shell -c "from django.conf import settings; print(settings.QWEN_MODEL, settings.QWEN_API_URL)"
+```
+
+The default model is `qwen3:0.6b-q4_K_M` and the endpoint is
+`http://localhost:11434/api/chat`. If you selected another model in `.env`, use
+that exact tag in both `ollama list` and `ollama run`. Restart Django after
+changing `.env`. Continue only when generation works and the settings agree.
+
+If the server cannot be reached, start the Ollama app or run `ollama serve` in a
+separate terminal and keep it running. If the tag is missing, run
+`ollama pull qwen3:0.6b-q4_K_M`, then repeat the checks.
+
 ## 4. Workshop tools
 Open another terminal, return to `starter/`, and activate `.venv` again:
 ```
@@ -97,3 +130,20 @@ From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
 `source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
 all workshop commands. Repeat activation in every new terminal.
 See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).
+
+## Demo passwords and terminal names
+
+Setup saves only its generated Alice/Bob demo passwords in the local ignored
+`starter/.env`. Codespaces prints the saved login summary on attach. In the
+**Tests** terminal, activate `.venv`, then run `python manage.py seed_demo --show-passwords`
+to display those logins again without changing accounts or tickets.
+For an older workshop copy whose passwords were never saved, explicitly run
+`python manage.py seed_demo --reset-passwords` once. This changes the Alice/Bob
+demo passwords and prints the new ones. After that, `--show-passwords` reprints
+them without changing accounts. Setup never silently resets existing passwords.
+
+In Codespaces right-click each terminal tab and choose **Rename**: use **Website**
+for Django, **Tests** for commands, and **NeMo** for Exercise 8's worker. Activate
+the environment in each terminal. The starter starts with `NEMO_ENABLED=False`;
+Exercise 8 sets it to `True`. Keep `NEMO_POLICY_MODE=deterministic` for Exercises
+8–9 so the new content flow, rather than the semantic classifier, explains the result.

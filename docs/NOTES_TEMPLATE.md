@@ -64,7 +64,9 @@ Record test output for another student trying to confirm, an expired confirmatio
 ## Delegated assistant access — Exercise 7
 
 - Account and requesting client displayed:
-- Denying consent prevented access:
+- Before a grant: assistant reply / ordinary ticket-page access:
+- After Deny access: assistant reply / ordinary ticket-page access:
+- After Read my tickets grant: assistant reply / ordinary ticket-page access:
 - Read-only grant allowed reading and refused creation:
 - Additional creation permission changed the result:
 - Expiration and revocation results:

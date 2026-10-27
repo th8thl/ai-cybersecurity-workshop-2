@@ -46,7 +46,9 @@ def _start():
 
 def check(stage, payload, provider="mock", trace=None):
     if not getattr(settings,"NEMO_CHECKS",True):
-        return  # Explicit unit-test override only; not a production env setting.
+        if trace is not None:
+            trace.append({"stage":stage, "engine":"NeMo Guardrails", "mode":"disabled", "skipped":True})
+        return  # Explicit workshop state; authorization checks remain active.
     mode = "deterministic" if provider == "mock" else getattr(settings,"NEMO_POLICY_MODE","semantic")
     if mode not in {"deterministic","semantic"}:
         raise GuardrailBlocked("Unknown NeMo policy mode; refusing action.")

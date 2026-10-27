@@ -3,7 +3,7 @@
 Complete Exercise 3 in [Exercises](EXERCISES.md) first. These requests check other
 invalid inputs after you have added the input checks.
 
-In Alice's assistant page, choose **Demo** and enable **Debug**. Copy each example
+In Alice's assistant page, keep **Qwen** selected and enable **Debug**. Copy each example
 into **Test a ticket request**, then click **Submit test request**. Record what
 the application returns and whether it matches the expected result below.
 

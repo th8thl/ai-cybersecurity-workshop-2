@@ -1,4 +1,5 @@
 import re
+import os
 from django.conf import settings
 from .mcp_authorization import current_access_token
 
@@ -9,7 +10,7 @@ def sanitize(value):
         return [sanitize(v) for v in value]
     if not isinstance(value, str):
         return value
-    known = [settings.SECRET_KEY, settings.GEMINI_API_KEY]
+    known = [settings.SECRET_KEY, settings.GEMINI_API_KEY, os.getenv("DEMO_ALICE_PASSWORD"), os.getenv("DEMO_BOB_PASSWORD")]
     known.append(current_access_token())
     for secret in known:
         if secret:

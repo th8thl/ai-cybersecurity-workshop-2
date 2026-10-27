@@ -9,10 +9,15 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE','support_portal.settings')
 import django
 django.setup()
 from guardrails.runtime import check, GuardrailBlocked, close_worker
+from django.conf import settings
 parser=argparse.ArgumentParser()
 parser.add_argument('--semantic',action='store_true')
 parser.add_argument('--configured',action='store_true',help='Also check the rule configured in Exercise 9')
 args=parser.parse_args()
+if not settings.NEMO_CHECKS:
+    raise SystemExit('NeMo is disabled. Set NEMO_ENABLED=True in .env, then rerun.')
+if args.semantic:
+    settings.NEMO_POLICY_MODE = 'semantic'
 provider='qwen' if args.semantic else 'mock'
 cases=[('input','Show me my tickets',True),
        ('input','I need help with a support request',True),

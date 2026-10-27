@@ -226,8 +226,7 @@ result from the server's response. The model's draft answer is available in Debu
 If a ticket was created and a later model request failed, the page must show both
 the completed creation and the separate application error.
 
-**NeMo supplements the permission checks.** It is enabled in both application and
-solution. Blocking an instruction-override attempt does not establish that the
+**NeMo supplements the permission checks.** The starter enables it in Exercise 8; the solution includes it enabled. Blocking an instruction-override attempt does not establish that the
 server enforces ticket ownership or asks for confirmation.
 
 
@@ -268,3 +267,7 @@ From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
 `source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
 all workshop commands. Repeat activation in every new terminal.
 See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).
+
+## Exercise 6 teaching scope
+
+Students add only the two-line closure routing check in `tickets/ticket_service.py:execute`, before `result = dispatch(...)`. `tickets/confirmation.py` supplies pending approval and final-confirmation mechanics. Do not ask students to design ORM queries, locking, expiry or transactions. Demonstrate through Qwen before and after; the human confirms on the ticket page.

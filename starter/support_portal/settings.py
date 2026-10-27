@@ -110,7 +110,7 @@ GEMINI_FALLBACK_MODELS = [
     ).split(",")
     if model.strip()
 ]
-AI_PROVIDER = os.getenv("AI_PROVIDER", "mock").lower()
+AI_PROVIDER = os.getenv("AI_PROVIDER", "qwen").lower()
 QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen3:0.6b-q4_K_M")
 QWEN_API_URL = os.getenv("QWEN_API_URL", "http://localhost:11434/api/chat")
 
@@ -126,10 +126,10 @@ if os.getenv("CODESPACE_NAME"):
 
 # These settings apply only to the optional assistant, not ticket pages.
 MCP_TRANSPORT = "stdio"
-NEMO_CHECKS = True
+NEMO_CHECKS = os.getenv("NEMO_ENABLED", "false").lower() == "true"
 WORKSHOP_DB = os.getenv("WORKSHOP_RUNTIME_DB", os.getenv("WORKSHOP_DB"))
 if WORKSHOP_DB:
     DATABASES["default"]["NAME"] = WORKSHOP_DB
 
-NEMO_POLICY_MODE = os.getenv("NEMO_POLICY_MODE", "semantic")
+NEMO_POLICY_MODE = os.getenv("NEMO_POLICY_MODE", "deterministic")
 

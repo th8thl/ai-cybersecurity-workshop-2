@@ -9,7 +9,7 @@
 </div>
 <div class="conversation" id="conversation" data-assistant-name="{{ theme.assistant_name }}" role="log" aria-live="polite">
 {% if not history %}<div class="bubble assistant"><span class="role">{{ theme.assistant_name }}</span>Hi {{ request.user.username|title }}! {{ portal.greeting }}</div>{% endif %}
-{% for item in history %}<div class="bubble {{ item.role }}"><span class="role">{% if item.role == 'user' %}You{% elif item.error or item.role == 'error' %}Application error{% elif item.source == 'ticket' %}Ticket result{% else %}{{ theme.assistant_name }} · AI{% endif %}</span>{{ item.text }}{% if item.ticket_id %}<p><a href="{% url 'ticket_detail' item.ticket_id %}" target="_blank" rel="noopener noreferrer" title="Opens in a new tab">Open ticket #{{ item.ticket_id }}</a></p>{% endif %}</div>{% endfor %}
+{% for item in history %}<div class="bubble {{ item.role }}{% if item.source == 'guardrail' %} safe-response{% endif %}"><span class="role">{% if item.role == 'user' %}You{% elif item.error or item.role == 'error' %}Application error{% elif item.source == 'ticket' %}Ticket result{% else %}{{ theme.assistant_name }} · AI{% endif %}</span>{{ item.text }}{% if item.ticket_id %}<p><a href="{% url 'ticket_detail' item.ticket_id %}" target="_blank" rel="noopener noreferrer" title="Opens in a new tab">View ticket #{{ item.ticket_id }}</a></p>{% endif %}</div>{% endfor %}
 </div>
 <div id="confirmations">{% for approval in approvals %}<p class="notice">Ticket #{{ approval.ticket.id }} is waiting for confirmation. <a href="{% url 'ticket_detail' approval.ticket.id %}" target="_blank" rel="noopener noreferrer">Review it on the ticket page</a>.</p>{% endfor %}</div>
 <form class="composer" method="post" id="chat-form" action="{% url 'assistant' %}">{% csrf_token %}<input type="hidden" name="form_token" value="{{ form_token }}"><label class="sr-only" for="message">Message {{ theme.assistant_name }}</label><div class="compose-row"><textarea id="message" name="message" maxlength="2000" placeholder="{{ portal.input_placeholder }}" required></textarea><button id="send">Send message</button></div>
@@ -17,7 +17,7 @@
 </form>
 </section>
 <aside class="panel debug-panel" id="debug-panel" aria-label="Debug">
-<div class="debug-head"><h2>Debug</h2><span class="muted">NeMo · MCP</span></div>
+<div class="debug-head"><h2>Debug</h2><span class="muted">NeMo {% if nemo_enabled %}on · {{ nemo_mode }}{% else %}off{% endif %} · MCP</span></div>
 <section class="debug-section" id="assistant-access"><h3>Authorization</h3>
 {% if authorization %}<p>Authorized until {{ authorization.expires_at|date:"H:i:s T" }}.</p><p class="muted">{{ permission_labels|join:", " }}</p>{% else %}<p>{{ authorization_error }}</p>{% endif %}
 <a href="{% url 'assistant_authorization' %}">{% if authorization %}Manage assistant access{% else %}Authorize assistant{% endif %}</a>

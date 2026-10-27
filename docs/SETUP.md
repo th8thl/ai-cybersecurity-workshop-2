@@ -20,6 +20,10 @@ and downloads Qwen automatically; the local instructions explain how to install 
 Do not commit these files or enter real student data. Setup preserves existing
 settings and passwords when you run it again.
 
+## Validate Ollama before the exercises
+
+Complete the generation and application-configuration checks in [local setup](LOCAL_SETUP.md#validate-ollama-before-starting-the-exercises) or [Codespaces setup](GITHUB_CODESPACES_SETUP.md#2-validate-ollama). Installing Ollama alone does not verify that its server and model work.
+
 ## Website addresses and first use
 
 - **Ticket list / landing page:** http://127.0.0.1:8000/tickets/
@@ -74,3 +78,20 @@ From `starter`, run `.\.venv\Scripts\Activate.ps1` on Windows PowerShell or
 `source .venv/bin/activate` in Codespaces/macOS/Linux. Then use `python ...` for
 all workshop commands. Repeat activation in every new terminal.
 See [exercise terminal instructions](EXERCISES.md#every-new-terminal-needs-the-workshop-environment).
+
+## Demo passwords and terminal names
+
+Setup saves only its generated Alice/Bob demo passwords in the local ignored
+`starter/.env`. Codespaces prints the saved login summary on attach. In the
+**Tests** terminal, activate `.venv`, then run `python manage.py seed_demo --show-passwords`
+to display those logins again without changing accounts or tickets.
+For an older workshop copy whose passwords were never saved, explicitly run
+`python manage.py seed_demo --reset-passwords` once. This changes the Alice/Bob
+demo passwords and prints the new ones. After that, `--show-passwords` reprints
+them without changing accounts. Setup never silently resets existing passwords.
+
+In Codespaces right-click each terminal tab and choose **Rename**: use **Website**
+for Django, **Tests** for commands, and **NeMo** for Exercise 8's worker. Activate
+the environment in each terminal. The starter starts with `NEMO_ENABLED=False`;
+Exercise 8 sets it to `True`. Keep `NEMO_POLICY_MODE=deterministic` for Exercises
+8–9 so the new content flow, rather than the semantic classifier, explains the result.

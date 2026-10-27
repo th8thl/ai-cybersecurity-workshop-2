@@ -54,7 +54,10 @@ def main():
         other=Ticket.objects.create(owner=bob,title='Bob synthetic private ticket')
         alice_grant,alice_token=issue_grant(alice,list(PERMISSIONS))
         bob_grant,bob_token=issue_grant(bob,['tickets:read'])
-        report={'authorization_fixture':'temporary users and consent records; real user grants unchanged'}
+        settings.NEMO_CHECKS = True  # Test fixture only; does not change the student's .env.
+        if args.semantic:
+            settings.NEMO_POLICY_MODE = "semantic"
+        report={'nemo_fixture':'enabled for this temporary integration check', 'authorization_fixture':'temporary users and consent records; real user grants unchanged'}
         assert alice_grant.token_hash!=alice_token and bob_grant.token_hash!=bob_token
         report['token_storage']='hashes only in access-grant records'
 
